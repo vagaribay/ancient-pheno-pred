@@ -1,0 +1,134 @@
+// QTL-based model assuming stabilizing selection
+// Valeria Anorve-Garibay
+// SLiM version 3.3.1
+// No scaling factor (all parameters are multiplied by 1)
+
+initialize() {
+	
+	// heritability
+	// defineConstant("h2", 0.5);
+	defineConstant("h2", 1.0);
+	
+	// VS: the sum of the variance in fitness plus the environmental variance in phenotype
+	// defineConstant("VS", 0.5);
+	// defineConstant("VS", 2.0);
+	defineConstant("VS", 1.0);
+	
+	initializeMutationRate(1e-08*1);
+	initializeTreeSeq();
+	//initializeRecombinationRate(1e-08*1);
+	
+	// m1 mutation type: neutral
+	initializeMutationType("m1", 0.5, "f", 0.0);
+	
+	// m2 mutation type: QTLs
+	initializeMutationType("m2", 0.5, "n", 0.0, 0.25);
+	m2.convertToSubstitution == F; // must be false
+	
+	initializeGenomicElementType("g1", c(m2), c(1));
+	
+	// exons aka 20 independent genes
+	
+	rec_ends = NULL;
+	rec_rates = NULL;
+	for (index in 1:20){
+		initializeGenomicElement(g1, (index - 1 )*25000 + 2, (index - 1 )*25000 + 24999 + 2);
+		rec_ends = c( rec_ends, (index - 1)*25000 + 2);
+		rec_ends = c( rec_ends, (index - 1)*25000 + 24999 + 2);
+		rec_rates = c( rec_rates, 0.5);
+		rec_rates = c( rec_rates, 1e-08*1);
+	}
+	initializeRecombinationRate(rec_rates, rec_ends);
+
+}
+
+fitness(m2) { return 1.0; } // This fitness(m2) call tells SLiM to ignore the selection coefficients of m2 mutations and simply treat them as neutral
+
+// calculation of phenotypic trait values and fitness effects
+
+1: late() {
+
+	// make the m2 mutations actually act as QTL mutations, rather than just being neutral
+	// calculate individual phenotype from the additive effects of the QTL mutations in the individual's genomes
+	// then calculate the fitness effect for the individual as a function of the individual's phenotype
+	
+	// all inds in the model
+	
+	// calculate the additive effect of all individual's QTLs mutations aka the genetic component of the phenotype	
+	inds = sim.subpopulations.individuals;
+	additive = inds.sumOfMutationsOfType(m2);
+	
+	// H2 = VA / VA + VE
+	
+	V_A = sd(additive)^2;
+	
+	// VE = VA - (H2)(VA) / H2
+	V_E=(V_A-h2*V_A)/h2;
+	
+	env = rnorm(size(inds), 0.0, sqrt(V_E));
+	
+	phenotypes = additive + env;
+	
+	heritability = var(additive) / var(phenotypes);
+	
+	// stabilizing selection
+	// based on w fitness equation defined by Kevin R. Thornton., 2019 and based on Burger (2000)
+	inds.fitnessScaling = exp(-(((phenotypes - 0.0)^(2)) / (2)*(VS)));
+	
+	inds.tagF = phenotypes;
+	
+	if (sim.generation % 100 == 0)
+		catn(sim.generation + ": Mean phenotype == " + mean(phenotypes) + ", h == " + heritability + ", VS == " + VS);
+}
+
+
+
+// burn-in for ancestral population
+1 early(){
+	setSeed(c(7998448156767));
+	sim.addSubpop("p1", 10000); }
+
+
+100000 late() {
+	all_inds = sim.subpopulations.individuals;
+	sample_inds = sample(all_inds, 100);
+	phenotypes = sample_inds.tagF;
+	writeFile("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/stabilizing/h1/VS1/phenotypesFile_stabilizing_h1_VS1_simulation_num_1_1" + ".txt", asString(phenotypes));
+	sample_inds.genomes.outputVCF("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/stabilizing/h1/VS1/vcfOutput_stabilizing_h1_VS1_simulation_num_1_1" + ".txt", simplifyNucleotides=T);
+}
+
+
+100100 late() {
+	all_inds = sim.subpopulations.individuals;
+	sample_inds = sample(all_inds, 100);
+	phenotypes = sample_inds.tagF;
+	writeFile("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/stabilizing/h1/VS1/phenotypesFile_stabilizing_h1_VS1_simulation_num_1_2" + ".txt", asString(phenotypes));
+	sample_inds.genomes.outputVCF("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/stabilizing/h1/VS1/vcfOutput_stabilizing_h1_VS1_simulation_num_1_2" + ".txt", simplifyNucleotides=T);
+}
+
+
+100200 late() {
+	all_inds = sim.subpopulations.individuals;
+	sample_inds = sample(all_inds, 100);
+	phenotypes = sample_inds.tagF;
+	writeFile("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/stabilizing/h1/VS1/phenotypesFile_stabilizing_h1_VS1_simulation_num_1_3" + ".txt", asString(phenotypes));
+	sample_inds.genomes.outputVCF("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/stabilizing/h1/VS1/vcfOutput_stabilizing_h1_VS1_simulation_num_1_3" + ".txt", simplifyNucleotides=T);
+}
+
+
+100300 late() {
+	all_inds = sim.subpopulations.individuals;
+	sample_inds = sample(all_inds, 100);
+	phenotypes = sample_inds.tagF;
+	writeFile("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/stabilizing/h1/VS1/phenotypesFile_stabilizing_h1_VS1_simulation_num_1_4" + ".txt", asString(phenotypes));
+	sample_inds.genomes.outputVCF("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/stabilizing/h1/VS1/vcfOutput_stabilizing_h1_VS1_simulation_num_1_4" + ".txt", simplifyNucleotides=T);
+}
+
+
+100400 late() {
+	all_inds = sim.subpopulations.individuals;
+	sample_inds = sample(all_inds, 100);
+	phenotypes = sample_inds.tagF;
+	writeFile("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/stabilizing/h1/VS1/phenotypesFile_stabilizing_h1_VS1_simulation_num_1_5" + ".txt", asString(phenotypes));
+	sample_inds.genomes.outputVCF("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/stabilizing/h1/VS1/vcfOutput_stabilizing_h1_VS1_simulation_num_1_5" + ".txt", simplifyNucleotides=T);
+}

@@ -60,8 +60,20 @@ mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selecti
 		cat("\n\n-------------------------------\n");
 		
 		QTLs = sim.mutationsOfType(m1);
-		sim.outputMutations(QTLs, path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt");
-		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(pheno));
-		inds.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides=T);
+	        f = sim.mutationFrequencies(NULL, QTLs);
+	        s = QTLs.selectionCoeff;
+	        p = QTLs.position;
+	        indices = order(f, F);
+	        lines = NULL;
+	        for (i in indices){
+	            mutLine = paste0(p[i], "\t", s[i], "\t", f[i], "\n");
+	            lines = c(lines, mutLine);
+	        }
+	        file = paste0(lines);
+	        file = "position\tselcoeff\tfreq\n" + file;
+	        writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
+			writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(pheno));
+			inds.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);
+	        inds.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
 }

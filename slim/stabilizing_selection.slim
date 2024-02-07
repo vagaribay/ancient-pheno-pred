@@ -56,6 +56,11 @@ initialize() {
 	inds.fitnessScaling = exp(-(((pheno - 0.0)^(2)) / (2)*(VS)));
 	inds.tagF = pheno;
 
+	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
+	{
+		catn(sim.cycle + ": mean pheno == " + mean(pheno) + ", hsq == " + estimated_hsq);
+	}
+
 }
 
 mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selection coefficients of m2 mutations
@@ -63,10 +68,7 @@ mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selecti
 100000:100400 late() {
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
-		catn("Generation: " + sim.cycle + "\n");
-		catn("Mean phenotype: " + mean(p1.individuals.tagF) + "\n");
-		cat("\n\n-------------------------------\n");
-		
+
 		QTLs = sim.mutationsOfType(m2);
 		f = sim.mutationFrequencies(NULL, QTLs);
 		s = QTLs.selectionCoeff;

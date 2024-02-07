@@ -6,10 +6,10 @@
 initialize() {
 	
 	initializeMutationRate(1e-08);
-
- 	defineConstant("VS", 1.0); // selection strength
+	
+	defineConstant("VS", 1.0); // selection strength
 	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/total/2/");
- defineConstant("qtls_mean", 0.25);
+	defineConstant("qtls_mean", 0.25);
 	catn("Directional selection: " + "hsq = " + hsq + " VS = " + VS + "\n");
 	
 	// QTLs
@@ -19,7 +19,7 @@ initialize() {
 	
 	//initializeGenomicElementType("g1", c(m1), c(1));
 	initializeGenomicElementType("g1", c(m1, m2), c(1, 0.01));
-
+	
 	// exons aka 20 independent genes
 	rec_ends = NULL;
 	rec_rates = NULL;
@@ -40,7 +40,7 @@ initialize() {
 	sim.addSubpop("p1", 10000); }
 
 1: late() {
-
+	
 	inds = sim.subpopulations.individuals;
 	additive = inds.sumOfMutationsOfType(m2);
 	// H2 = VA / VA + VE
@@ -51,19 +51,19 @@ initialize() {
 	estimated_hsq = var(additive) / var(pheno);
 	// stabilizing selection
 	// based on w fitness equation defined by Kevin R. Thornton., 2019 and based on Burger (2000)
-
- if(sim.cycle <= 100000)
- {
-   inds.fitnessScaling = exp(-(((pheno - 0.0)^(2)) / (2)*(VS)));
-   inds.tagF = pheno;
- }
-
- if(sim.cycle > 100000)
- {
-   inds.fitnessScaling = exp(-(((pheno - 1.0)^(2)) / (2)*(VS)));
-   inds.tagF = pheno;
- }
- 
+	
+	if(sim.cycle <= 100000)
+	{
+		inds.fitnessScaling = exp(-(((pheno - 0.0)^(2)) / (2)*(VS)));
+		inds.tagF = pheno;
+	}
+	
+	if(sim.cycle > 100000)
+	{
+		inds.fitnessScaling = exp(-(((pheno - 1.0)^(2)) / (2)*(VS)));
+		inds.tagF = pheno;
+	}
+	
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
 		catn(sim.cycle + ": mean pheno == " + mean(pheno) + ", hsq == " + estimated_hsq);
@@ -76,7 +76,7 @@ mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selecti
 100000:100400 late() {
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
-
+		
 		QTLs = sim.mutationsOfType(m2);
 		f = sim.mutationFrequencies(NULL, QTLs);
 		s = QTLs.selectionCoeff;
@@ -90,7 +90,7 @@ mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selecti
 		file = paste0(lines);
 		file = "position\tselcoeff\tfreq\n" + file;
 		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
-
+		
 		sample = sample(p1.individuals, 100);
 		sample_pheno = sample.tagF;
 		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));

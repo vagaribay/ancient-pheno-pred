@@ -4,16 +4,20 @@
 // No scaling factor
 
 initialize() {
-
-	initializeMutationRate(1e-08);
-    
-    defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/neutral/total/");
-    
-	// QTLs
-	initializeMutationType("m1", 0.5, "n", 0.0, 0.25);
-	m1.convertToSubstitution == F;
 	
-	initializeGenomicElementType("g1", c(m1), c(1));
+	initializeMutationRate(1e-08);
+	
+	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/neutral/total/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/neutral/mid/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/neutral/low/");
+	
+	// QTLs
+	initializeMutationType("m1", 0.5, "f", 0.0); // neutral
+	initializeMutationType("m2", 0.5, "n", 0.0, 0.25); // QTL
+	m2.convertToSubstitution == F;
+	
+	//initializeGenomicElementType("g1", c(m1), c(1));
+	initializeGenomicElementType("g1", c(m1, m2), c(1, 0.01));
 	
 	// exons aka 20 independent regions
 	rec_ends = NULL;
@@ -28,18 +32,16 @@ initialize() {
 	initializeRecombinationRate(rec_rates, rec_ends);
 }
 
-mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selection coefficients of m1 mutations
-
 // burn-in for ancestral population
-1 early() {
+1 late() {
 	// save this run's identifier, used to save and restore
 	defineConstant("simID", getSeed());
 	sim.addSubpop("p1", 10000); }
 
-// calculation of phenotypic trait values and fitness effects
-1:100400 late() {
-	inds = sample(sim.subpopulations.individuals, 100);
-	additive = inds.sumOfMutationsOfType(m1);
+1: late() {
+	
+	inds = sim.subpopulations.individuals;
+	additive = inds.sumOfMutationsOfType(m2);
 	V_A = sd(additive)^2;
 	V_E=(V_A-hsq*V_A)/hsq;
 	env = rnorm(size(inds), 0.0, sqrt(V_E));
@@ -47,28 +49,35 @@ mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selecti
 	estimated_hsq = var(additive) / var(pheno);
 	// neutral evolution
 	inds.fitnessScaling = 1;
+	inds.tagF = pheno;
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
-		catn("Generation: " + sim.cycle + "\n");
-		catn("Mean phenotype: " + mean(pheno) + "\n");
-		catn("Estimated hsq: " + estimated_hsq + "\n");
-		cat("\n\n-------------------------------\n");
-		
-		QTLs = sim.mutationsOfType(m1);
-        f = sim.mutationFrequencies(NULL, QTLs);
-        s = QTLs.selectionCoeff;
-        p = QTLs.position;
-        indices = order(f, F);
-        lines = NULL;
-        for (i in indices){
-            mutLine = paste0(p[i], "\t", s[i], "\t", f[i], "\n");
-            lines = c(lines, mutLine);
-        }
-        file = paste0(lines);
-        file = "position\tselcoeff\tfreq\n" + file;
-        writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
-		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(pheno));
-		inds.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);
-        inds.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+		catn(sim.cycle + ": mean pheno == " + mean(pheno) + ", hsq == " + estimated_hsq);
+	}
+}
+
+mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selection coefficients of m2 mutations
+
+100000:100400 late() {
+	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
+	{
+		QTLs = sim.mutationsOfType(m2);
+		f = sim.mutationFrequencies(NULL, QTLs);
+		s = QTLs.selectionCoeff;
+		p = QTLs.position;
+		indices = order(f, F);
+		lines = NULL;
+		for (i in indices){
+			mutLine = paste0(p[i], "\t", s[i], "\t", f[i], "\n");
+			lines = c(lines, mutLine);
+		}
+		file = paste0(lines);
+		file = "position\tselcoeff\tfreq\n" + file;
+		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
+		sample = sample(p1.individuals, 100);
+		sample_pheno = sample.tagF;
+		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
+		sample.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);
+		sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
 }

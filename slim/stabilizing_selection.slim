@@ -41,9 +41,7 @@ initialize() {
 	defineConstant("simID", getSeed());
 	sim.addSubpop("p1", 10000); }
 
-mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selection coefficients of m1 mutations
-
-1:100400 late() {
+1: late() {
 
 	inds = sim.subpopulations.individuals;
 	additive = inds.sumOfMutationsOfType(m2);
@@ -57,12 +55,16 @@ mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selecti
 	// based on w fitness equation defined by Kevin R. Thornton., 2019 and based on Burger (2000)
 	inds.fitnessScaling = exp(-(((pheno - 0.0)^(2)) / (2)*(VS)));
 	inds.tagF = pheno;
-	
+
+}
+
+mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selection coefficients of m2 mutations
+
+100000:100400 late() {
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
 		catn("Generation: " + sim.cycle + "\n");
-		catn("Mean phenotype: " + mean(pheno) + "\n");
-		catn("Estimated hsq: " + estimated_hsq + "\n");
+		catn("Mean phenotype: " + mean(p1.individuals.tagF) + "\n");
 		cat("\n\n-------------------------------\n");
 		
 		QTLs = sim.mutationsOfType(m2);
@@ -79,7 +81,7 @@ mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selecti
 		file = "position\tselcoeff\tfreq\n" + file;
 		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
 
-		sample = sample(inds, 100);
+		sample = sample(p1.individuals, 100);
 		sample_pheno = sample.tagF;
 		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
 		sample.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);

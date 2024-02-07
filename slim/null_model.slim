@@ -16,8 +16,8 @@ initialize() {
 	initializeMutationType("m2", 0.5, "n", 0.0, 0.25); // QTL
 	m2.convertToSubstitution == F;
 	
-	//initializeGenomicElementType("g1", c(m1), c(1));
-	initializeGenomicElementType("g1", c(m1, m2), c(1, 0.01));
+	initializeGenomicElementType("g1", c(m2), c(1));
+	//initializeGenomicElementType("g1", c(m1, m2), c(1, 0.01));
 	
 	// exons aka 20 independent regions
 	rec_ends = NULL;

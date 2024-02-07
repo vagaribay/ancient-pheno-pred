@@ -10,16 +10,18 @@ initialize() {
 	
 	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/total/0.5/");
 	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/total/1/");
-	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/total/2/");
-	
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/total/2/");
+
 	catn("Stabilizing selection: " + "hsq = " + hsq + " VS = " + VS + "\n");
 	
 	// QTLs
-	initializeMutationType("m1", 0.5, "n", 0.0, 0.25);
-	m1.convertToSubstitution == F;
+	initializeMutationType("m1", 0.5, "f", 0.0); // neutral
+	initializeMutationType("m2", 0.5, "n", 0.0, 0.25); // QTL
+	m2.convertToSubstitution == F;
 	
-	initializeGenomicElementType("g1", c(m1), c(1));
-	
+	//initializeGenomicElementType("g1", c(m1), c(1));
+	initializeGenomicElementType("g1", c(m1, m2), c(1, 0.01));
+
 	// exons aka 20 independent genes
 	rec_ends = NULL;
 	rec_rates = NULL;
@@ -33,18 +35,18 @@ initialize() {
 	initializeRecombinationRate(rec_rates, rec_ends);
 }
 
-mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selection coefficients of m1 mutations
-
 // burn-in for ancestral population
-1 early(){
+1 late(){
 	// save this run's identifier, used to save and restore
 	defineConstant("simID", getSeed());
 	sim.addSubpop("p1", 10000); }
 
+mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selection coefficients of m1 mutations
+
 1:100400 late() {
-	
-	inds = sample(sim.subpopulations.individuals, 100);
-	additive = inds.sumOfMutationsOfType(m1);
+
+	inds = sim.subpopulations.individuals;
+	additive = inds.sumOfMutationsOfType(m2);
 	// H2 = VA / VA + VE
 	V_A = sd(additive)^2;
 	V_E=(V_A-hsq*V_A)/hsq;
@@ -54,15 +56,16 @@ mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selecti
 	// stabilizing selection
 	// based on w fitness equation defined by Kevin R. Thornton., 2019 and based on Burger (2000)
 	inds.fitnessScaling = exp(-(((pheno - 0.0)^(2)) / (2)*(VS)));
+	inds.tagF = pheno;
 	
-	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
+	if(sim.cycle == 1000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
 		catn("Generation: " + sim.cycle + "\n");
 		catn("Mean phenotype: " + mean(pheno) + "\n");
 		catn("Estimated hsq: " + estimated_hsq + "\n");
 		cat("\n\n-------------------------------\n");
 		
-		QTLs = sim.mutationsOfType(m1);
+		QTLs = sim.mutationsOfType(m2);
 		f = sim.mutationFrequencies(NULL, QTLs);
 		s = QTLs.selectionCoeff;
 		p = QTLs.position;
@@ -75,8 +78,11 @@ mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selecti
 		file = paste0(lines);
 		file = "position\tselcoeff\tfreq\n" + file;
 		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
-		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(pheno));
-		inds.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);
-		inds.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+
+		sample = sample(inds, 100);
+		sample_pheno = sample.tagF;
+		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
+		sample.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);
+		sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
 }

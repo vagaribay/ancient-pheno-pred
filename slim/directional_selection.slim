@@ -7,10 +7,10 @@ initialize() {
 	
 	initializeMutationRate(1e-08);
 	
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/025/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/total/0025/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/total/00025/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/total/000025/");
+	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/025/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/0025/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/00025/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/000025/");
 	
  	// VS: the sum of the variance in fitness plus the environmental variance in phenotype
 	defineConstant("VS", 1.0);
@@ -56,75 +56,46 @@ initialize() {
 	
 	// during the burn-in period, trait will be under stabilizing selection at a zero optimum
 	// rigth after the burn-in (10N), there is an optimum shift that pushes the effect sizes distribution towards the new optimum (directional selection)
-	if(sim.cycle == 100000){
-		// stabilizing selection
-		// based on w fitness equation defined by Kevin R. Thornton., 2019 and based on Burger (2000)
+	if(sim.cycle <= 100000){
 		inds.fitnessScaling = exp(-(((pheno - 0.0)^(2)) / (2)*(VS)));
 	}	
 
-	if(sim.cycle == 100000){
-		// stabilizing selection
-		// based on w fitness equation defined by Kevin R. Thornton., 2019 and based on Burger (2000)
+	if(sim.cycle > 100000){
 		inds.fitnessScaling = exp(-(((pheno - 1.0)^(2)) / (2)*(VS)));
 	}
 
+	inds.tagF = phenotypes;
+
+	if(sim.cycle >= 100000)
+	{
+		catn("# " + sim.cycle + " " + mean(pheno));
+	}
+}
+
+mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selection coefficients of m2 mutations
+
+100000:100400 late() {
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
-		catn(sim.cycle + ": mean pheno == " + mean(pheno) + ", hsq == " + estimated_hsq);
+
+		QTLs = sim.mutationsOfType(m2);
+		f = sim.mutationFrequencies(NULL, QTLs);
+		s = QTLs.selectionCoeff;
+		p = QTLs.position;
+		indices = order(f, F);
+		lines = NULL;
+		for (i in indices){
+			mutLine = paste0(p[i], "\t", s[i], "\t", f[i], "\n");
+			lines = c(lines, mutLine);
+		}
+		file = paste0(lines);
+		file = "position\tselcoeff\tfreq\n" + file;
+		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
+
+		sample = sample(p1.individuals, 100);
+		sample_pheno = sample.tagF;
+		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
+		sample.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);
+		sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
-
-	inds.tagF = phenotypes;
-	
-	if (sim.generation % 1 == 0)
-		catn(sim.generation + "  " + mean(phenotypes) + "    " + heritability + "    " + VS);
-}
-
-// burn-in for ancestral population
-1 early(){
-	setSeed(c(5572656811440));
-	sim.addSubpop("p1", 10000); }
-
-
-100000 late() {
-	all_inds = sim.subpopulations.individuals;
-	sample_inds = sample(all_inds, 100);
-	phenotypes = sample_inds.tagF;
-	writeFile("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/directional/1/varNor/phenotypesFile_directional_h08_opt1_varNor_simulation_num_1_1" + ".txt", asString(phenotypes));
-	sample_inds.genomes.outputVCF("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/directional/1/varNor/vcfOutput_directional_h08_opt1_varNor_simulation_num_1_1" + ".txt", simplifyNucleotides=T);
-}
-
-
-100100 late() {
-	all_inds = sim.subpopulations.individuals;
-	sample_inds = sample(all_inds, 100);
-	phenotypes = sample_inds.tagF;
-	writeFile("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/directional/1/varNor/phenotypesFile_directional_h08_opt1_varNor_simulation_num_1_2" + ".txt", asString(phenotypes));
-	sample_inds.genomes.outputVCF("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/directional/1/varNor/vcfOutput_directional_h08_opt1_varNor_simulation_num_1_2" + ".txt", simplifyNucleotides=T);
-}
-
-
-100200 late() {
-	all_inds = sim.subpopulations.individuals;
-	sample_inds = sample(all_inds, 100);
-	phenotypes = sample_inds.tagF;
-	writeFile("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/directional/1/varNor/phenotypesFile_directional_h08_opt1_varNor_simulation_num_1_3" + ".txt", asString(phenotypes));
-	sample_inds.genomes.outputVCF("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/directional/1/varNor/vcfOutput_directional_h08_opt1_varNor_simulation_num_1_3" + ".txt", simplifyNucleotides=T);
-}
-
-
-100300 late() {
-	all_inds = sim.subpopulations.individuals;
-	sample_inds = sample(all_inds, 100);
-	phenotypes = sample_inds.tagF;
-	writeFile("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/directional/1/varNor/phenotypesFile_directional_h08_opt1_varNor_simulation_num_1_4" + ".txt", asString(phenotypes));
-	sample_inds.genomes.outputVCF("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/directional/1/varNor/vcfOutput_directional_h08_opt1_varNor_simulation_num_1_4" + ".txt", simplifyNucleotides=T);
-}
-
-
-100400 late() {
-	all_inds = sim.subpopulations.individuals;
-	sample_inds = sample(all_inds, 100);
-	phenotypes = sample_inds.tagF;
-	writeFile("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/directional/1/varNor/phenotypesFile_directional_h08_opt1_varNor_simulation_num_1_5" + ".txt", asString(phenotypes));
-	sample_inds.genomes.outputVCF("/mnt/Timina/dortega/vanorve/cluster/ordenado/scripts/directional/1/varNor/vcfOutput_directional_h08_opt1_varNor_simulation_num_1_5" + ".txt", simplifyNucleotides=T);
 }

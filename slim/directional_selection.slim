@@ -15,7 +15,7 @@ initialize() {
  	// VS: the sum of the variance in fitness plus the environmental variance in phenotype
 	defineConstant("VS", 1.0);
 
-	catn("Directional selection: " + "hsq = " + hsq + " VS = " + VS + "\n");
+	catn("Directional selection: " + "hsq = " + hsq + " VS = " + VS + " QTLs sd: " +  QTLs_sd + "\n");
 		
 	// QTLs
 	initializeMutationType("m1", 0.5, "f", 0.0); // neutral

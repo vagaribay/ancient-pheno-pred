@@ -7,8 +7,8 @@ initialize() {
 	
 	initializeMutationRate(1e-08);
 	
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/025/");
-	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/0025/");
+	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/025/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/0025/");
 	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/00025/");
 	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/000025/");
 	
@@ -64,7 +64,7 @@ initialize() {
 		inds.fitnessScaling = exp(-(((pheno - 1.0)^(2)) / (2)*(VS)));
 	}
 
-	inds.tagF = phenotypes;
+	inds.tagF = pheno;
 
 	if(sim.cycle >= 100000)
 	{

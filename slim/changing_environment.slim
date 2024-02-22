@@ -21,7 +21,7 @@ initialize() {
 		
 	// QTLs
 	initializeMutationType("m1", 0.5, "f", 0.0); // neutral
-	initializeMutationType("m2", 0.5, "n", 0.0, QTLs_sd); // QTL
+	initializeMutationType("m2", 0.5, "n", 0.0, 0.25); // QTL
 	m2.convertToSubstitution == F;
 	
 	initializeGenomicElementType("g1", c(m2), c(1));

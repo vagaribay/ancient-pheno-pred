@@ -7,17 +7,17 @@ initialize() {
 	
 	initializeMutationRate(1e-08);
 	
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/mid/025/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/mid/0025/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/mid/00025/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/mid/000025/");
+	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/VEx2/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/VEb2/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/ENVx3/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/directional/total/ENVx30/");
 	
  	// VS: the sum of the variance in fitness plus the environmental variance in phenotype
 	defineConstant("VS", 1.0);
 
 	catn("Changing environment: " + "hsq = " + hsq + "\n");
 
-  //defineConstant("m_change", 1.0);
+  	defineConstant("m_change", 1.0);
 		
 	// QTLs
 	initializeMutationType("m1", 0.5, "f", 0.0); // neutral

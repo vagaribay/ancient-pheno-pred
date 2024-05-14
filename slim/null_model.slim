@@ -79,5 +79,7 @@ mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selecti
 		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
 		sample.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);
 		sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+		all_inds = sim.subpopulations.individuals.genomes;
+		all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
 }

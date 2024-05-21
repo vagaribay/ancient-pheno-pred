@@ -8,11 +8,12 @@ initialize() {
 	
 	initializeMutationRate(1e-08);
 	
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/mid/0.5/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/mid/1/");
-	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing/mid/2/");
+	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing_new/total/1/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing_new/total/4/");
+	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing_new/total/7/");
 
-	catn("Stabilizing selection: " + "hsq = " + hsq + " VS = " + VS + "\n");
+	catn("Stabilizing selection: " + "hsq = " + hsq + " w = " + w + "\n");
+        defineConstant("opt", 0.0);
 	
 	// QTLs
 	initializeMutationType("m1", 0.5, "f", 0.0); // neutral
@@ -52,8 +53,9 @@ initialize() {
 	pheno = additive + env;
 	estimated_hsq = var(additive) / var(pheno);
 	// stabilizing selection
-	// based on w fitness equation defined by Kevin R. Thornton., 2019 and based on Burger (2000)
-	inds.fitnessScaling = exp(-(((pheno - 0.0)^(2)) / (2)*(VS)));
+	inds.fitnessScaling = exp(-((pheno - opt)^2) / ((2)*(w^2)));
+
+ 
 	inds.tagF = pheno;
 
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)

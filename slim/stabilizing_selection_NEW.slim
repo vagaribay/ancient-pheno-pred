@@ -11,9 +11,10 @@ initialize() {
 	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing_new/total/1/");
 	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing_new/total/4/");
 	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing_new/total/7/");
-
+	
+	defineConstant("opt", 0.0);
+	
 	catn("Stabilizing selection: " + "hsq = " + hsq + " w = " + w + "\n");
-        defineConstant("opt", 0.0);
 	
 	// QTLs
 	initializeMutationType("m1", 0.5, "f", 0.0); // neutral
@@ -22,7 +23,7 @@ initialize() {
 	
 	initializeGenomicElementType("g1", c(m2), c(1));
 	//initializeGenomicElementType("g1", c(m1, m2), c(1, 0.01));
-
+	
 	// exons aka 20 independent genes
 	rec_ends = NULL;
 	rec_rates = NULL;
@@ -43,7 +44,7 @@ initialize() {
 	sim.addSubpop("p1", 10000); }
 
 1: late() {
-
+	
 	inds = sim.subpopulations.individuals;
 	additive = inds.sumOfMutationsOfType(m2);
 	// H2 = VA / VA + VE
@@ -53,11 +54,9 @@ initialize() {
 	pheno = additive + env;
 	estimated_hsq = var(additive) / var(pheno);
 	// stabilizing selection
-	inds.fitnessScaling = exp(-((pheno - opt)^2) / ((2)*(w^2)));
-
- 
+	inds.fitnessScaling = exp(-((pheno - opt)^2)/((2)*(w^2)));
 	inds.tagF = pheno;
-
+	
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
 		catn(sim.cycle + ": mean pheno == " + mean(pheno) + ", hsq == " + estimated_hsq);
@@ -70,7 +69,7 @@ mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selecti
 100000:100400 late() {
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
-
+		
 		QTLs = sim.mutationsOfType(m2);
 		f = sim.mutationFrequencies(NULL, QTLs);
 		s = QTLs.selectionCoeff;
@@ -84,7 +83,7 @@ mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selecti
 		file = paste0(lines);
 		file = "position\tselcoeff\tfreq\n" + file;
 		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
-
+		
 		sample = sample(p1.individuals, 100);
 		sample_pheno = sample.tagF;
 		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));

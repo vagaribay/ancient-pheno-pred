@@ -44,8 +44,8 @@ mutationEffect(m1) { return 1.0; }
 	// H2 = VA / VA + VE
 	V_G = sd(G)^2;
 	V_E = (V_G-hsq*V_G)/hsq;
-	E = rnorm(size(inds), 0.0, sqrt(V_E));
-	P = G + E;
+	env = rnorm(size(inds), 0.0, sqrt(V_E));
+	P = G + env;
 	inds.tagF = P;
 }
 

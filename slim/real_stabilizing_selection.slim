@@ -7,8 +7,6 @@ initialize() {
 	initializeMutationRate(1e-08);
 	
 	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing_new/total/1/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing_new/total/4/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/stabilizing_new/total/7/");
 		
 	catn("Stabilizing selection: " + "hsq = " + hsq + " w = " + w + "\n");
 	
@@ -42,15 +40,17 @@ mutationEffect(m1) { return 1.0; }
 1: late() {
 	
 	inds = p1.individuals;
+	// sum the additive effect sizes of QTLs
 	G = inds.sumOfMutationsOfType(m1);
+	// model environmental variance according to target hsq
 	// H2 = VA / VA + VE
 	V_G = sd(G)^2;
 	V_E = (V_G-hsq*V_G)/hsq;
-	phen = G;
-	// stabilizing selection
-	VS =  (w^2) + V_E;
-	inds.fitnessScaling = exp(-((phen - phen_opt)^2)/((2)*(VS)));
-	inds.tagF = phen;
+	E = rnorm(size(inds), 0.0, sqrt(V_E));
+	P = G + E;
+	// set fitness effects based on stabilizing selection
+	inds.fitnessScaling = exp(-(((P - P_O)^2) / ((2)*(w^2))));
+	inds.tagF = P;
 }
 
 1:100400 late() {
@@ -63,7 +63,7 @@ mutationEffect(m1) { return 1.0; }
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
 		
-		QTLs = sim.mutationsOfType(m2);
+		QTLs = sim.mutationsOfType(m1);
 		f = sim.mutationFrequencies(NULL, QTLs);
 		s = QTLs.selectionCoeff;
 		p = QTLs.position;
@@ -80,9 +80,8 @@ mutationEffect(m1) { return 1.0; }
 		sample = sample(p1.individuals, 100);
 		sample_pheno = sample.tagF;
 		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
-		sample.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);
 		sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
-		all_inds = sim.subpopulations.individuals.genomes;
+		all_inds = p1.individuals.genomes;
 		all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
 }

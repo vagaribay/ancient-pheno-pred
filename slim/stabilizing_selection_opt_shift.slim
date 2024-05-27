@@ -5,11 +5,11 @@
 initialize() {
 	
 	initializeMutationRate(1e-08);
- 
+	
 	catn("Directional selection: " + "hsq = " + hsq + " w = " + w + "\n");
-  defineConstant("P_O", 0.0);
+	defineConstant("P_O", 0.0);
 	defineConstant("P_O_new", 1.0);
- 
+	
 	// QTLs
 	initializeMutationType("m1", 0.5, "n", 0.0, 0.25); // QTL
 	m1.convertToSubstitution == F;
@@ -49,16 +49,16 @@ mutationEffect(m1) { return 1.0; }
 	env = rnorm(size(inds), 0.0, sqrt(V_E));
 	P = G + env;
 	// set fitness effects based on stabilizing selection
-  // during the burn-in period, trait will be under stabilizing selection at P_0 = 0
+	// during the burn-in period, trait will be under stabilizing selection at P_0 = 0
 	// rigth after the burn-in (10N), there is an optimum shift that pushes the effect sizes distribution towards the new optimum P_0 = 1 (directional selection)
 	if(sim.cycle <= 100000){
 		inds.fitnessScaling = exp(-(((P - P_O)^2) / ((2)*(w^2))));
-	}	
-
+	}
+	
 	if(sim.cycle > 100000){
 		inds.fitnessScaling = exp(-(((P - P_O_new)^2) / ((2)*(w^2))));
 	}
- 
+	
 	inds.tagF = P;
 }
 
@@ -94,3 +94,4 @@ mutationEffect(m1) { return 1.0; }
 		all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
 }
+

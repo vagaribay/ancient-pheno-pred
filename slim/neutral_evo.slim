@@ -6,10 +6,7 @@ initialize() {
 	
 	initializeMutationRate(1e-08);
 	
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/pheno-pred/output/neutral/total/");
-	defineConstant("path", "/mnt/Timina/dortega/vanorve/pheno-pred/output/neutral/mid/");
-	
-	catn("Neutral Evolution: " + "hsq = " + hsq);
+	//defineConstant("path", "");
 	
 	// QTLs
 	initializeMutationType("m1", 0.5, "n", 0.0, 0.25); // QTL
@@ -30,7 +27,7 @@ initialize() {
 	initializeRecombinationRate(rec_rates, rec_ends);
 }
 
-mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selection coefficients of m2 mutations
+mutationEffect(m1) { return 1.0; }
 
 // burn-in for ancestral population
 1 early(){
@@ -40,19 +37,19 @@ mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selecti
 
 1: late() {
 	
-	inds = sim.subpopulations.individuals;
-	additive = inds.sumOfMutationsOfType(m1);
+	inds = p1.individuals;
+	// sum the additive effect sizes of QTLs
+	G = inds.sumOfMutationsOfType(m1);
+	// model environmental variance according to target hsq
 	// H2 = VA / VA + VE
-	V_A = sd(additive)^2;
-	V_E=(V_A-hsq*V_A)/hsq;
-	env = rnorm(size(inds), 0.0, sqrt(V_E));
-	pheno = additive + env;
-	estimated_hsq = var(additive) / var(pheno);
-	inds.tagF = pheno;
-
+	V_G = sd(G)^2;
+	V_E = (V_G-hsq*V_G)/hsq;
+	E = rnorm(size(inds), 0.0, sqrt(V_E));
+	P = G + E;
+	inds.tagF = P;
 }
 
-1:100400 late() {
+100000:100400 late() {
 	mean_pheno =  mean(p1.individuals.tagF);
 	var_pheno = var(p1.individuals.tagF);
 	catn(sim.cycle + ": m == " + mean_pheno + ", v == " + var_pheno);
@@ -62,7 +59,7 @@ mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selecti
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
 		
-		QTLs = sim.mutationsOfType(m2);
+		QTLs = sim.mutationsOfType(m1);
 		f = sim.mutationFrequencies(NULL, QTLs);
 		s = QTLs.selectionCoeff;
 		p = QTLs.position;
@@ -79,9 +76,8 @@ mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selecti
 		sample = sample(p1.individuals, 100);
 		sample_pheno = sample.tagF;
 		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
-		sample.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);
 		sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
-		all_inds = sim.subpopulations.individuals.genomes;
+		all_inds = p1.individuals.genomes;
 		all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
 }

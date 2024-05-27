@@ -49,19 +49,8 @@ mutationEffect(m1) { return 1.0; }
 	phen = G;
 	// stabilizing selection
 	//inds.fitnessScaling = exp(-((pheno - opt)^2)/((2)*(w^2)));
-
-
-
-
-
-
-	((phen - phen_opt)^2) / (2)*  (((w)^2) + V_E)
-
-
-
-
-	inds.tagF = pheno;
-
+	VS =  (w^2) + V_E;
+	inds.fitnessScaling = ((phen - phen_opt)^2) / ((2)*(VS));
 }
 
 1:100400 late() {

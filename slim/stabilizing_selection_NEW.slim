@@ -55,12 +55,13 @@ mutationEffect(m1) { return 1.0; } // this call tells SLiM to ignore the selecti
 	// stabilizing selection
 	inds.fitnessScaling = exp(-((pheno - opt)^2)/((2)*(w^2)));
 	inds.tagF = pheno;
-	
-	if (sim.cycle % 100 == 0)
-	{
-		catn(sim.cycle + ": mean pheno == " + mean(pheno) + ", var pheno == " + var(pheno));
-	}
 
+}
+
+1:100400 late() {
+	mean_pheno =  mean(p1.individuals.tagF);
+	var_pheno = var(p1.individuals.tagF);
+	catn(sim.cycle + ": m == " + mean_pheno + ", v == " + var_pheno);
 }
 
 100000:100400 late() {

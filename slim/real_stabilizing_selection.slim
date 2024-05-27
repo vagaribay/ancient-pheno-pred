@@ -53,7 +53,7 @@ mutationEffect(m1) { return 1.0; }
 	inds.tagF = P;
 }
 
-1:100400 late() {
+100000:100400 late() {
 	mean_pheno =  mean(p1.individuals.tagF);
 	var_pheno = var(p1.individuals.tagF);
 	catn(sim.cycle + ": m == " + mean_pheno + ", v == " + var_pheno);

@@ -41,16 +41,16 @@ mutationEffect(m1) { return 1.0; }
 
 1: late() {
 	
-	inds = sim.subpopulations.individuals;
+	inds = p1.individuals;
 	G = inds.sumOfMutationsOfType(m1);
 	// H2 = VA / VA + VE
 	V_G = sd(G)^2;
 	V_E = (V_G-hsq*V_G)/hsq;
 	phen = G;
 	// stabilizing selection
-	//inds.fitnessScaling = exp(-((pheno - opt)^2)/((2)*(w^2)));
 	VS =  (w^2) + V_E;
-	inds.fitnessScaling = ((phen - phen_opt)^2) / ((2)*(VS));
+	inds.fitnessScaling = exp(-((phen - phen_opt)^2)/((2)*(VS)));
+	inds.tagF = phen;
 }
 
 1:100400 late() {

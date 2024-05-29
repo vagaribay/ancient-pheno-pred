@@ -6,8 +6,6 @@ initialize() {
 	
 	initializeMutationRate(1e-08);
 	
-	//defineConstant("path", "");
-	
 	// QTLs
 	initializeMutationType("m1", 0.5, "n", 0.0, 0.25); // QTL
 	m1.convertToSubstitution == F;
@@ -46,6 +44,8 @@ mutationEffect(m1) { return 1.0; }
 	V_E = (V_G-hsq*V_G)/hsq;
 	env = rnorm(size(inds), 0.0, sqrt(V_E));
 	P = G + env;
+	// set fitness effects based on stabilizing selection
+	//inds.fitnessScaling = exp(-(((P - P_O)^2) / ((2)*(w^2))));
 	inds.tagF = P;
 }
 

@@ -11,7 +11,7 @@ initialize() {
 	defineConstant("P_O_new", 1.0);
 	
 	// QTLs
-	initializeMutationType("m1", 0.5, "n", 0.0, 0.25); // QTL
+	initializeMutationType("m1", 0.5, "n", 0.0, QTL_sd); // QTL
 	m1.convertToSubstitution == F;
 	
 	initializeGenomicElementType("g1", c(m1), c(1));

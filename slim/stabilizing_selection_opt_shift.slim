@@ -5,11 +5,12 @@
 initialize() {
 	
 	initializeMutationRate(1e-08);
-	
-	catn("Directional selection: " + "hsq = " + hsq + " w = " + w + "\n");
+
 	defineConstant("P_O", 0.0);
 	defineConstant("P_O_new", 1.0);
 	defineConstant("w", 1.0);
+
+	catn("Directional selection: " + "hsq = " + hsq + " QTLs sd = " + QTL_sd + "\n");
 	
 	// QTLs
 	initializeMutationType("m1", 0.5, "n", 0.0, QTL_sd); // QTL

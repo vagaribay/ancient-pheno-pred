@@ -5,11 +5,11 @@
 initialize() {
 	
 	initializeMutationRate(1e-08);
-
+	
 	defineConstant("P_O", 0.0);
 	defineConstant("w", 1.0);
-defineConstant("hsq", 0.5);
-
+	defineConstant("hsq", 0.5);
+	
 	//catn("Directional selection: " + "hsq = " + hsq + " QTLs sd = " + QTL_sd + "\n");
 	
 	// QTLs
@@ -53,7 +53,7 @@ mutationEffect(m1) { return 1.0; }
 		env = rnorm(size(inds), 0.0, sqrt(V_E));
 		P = G + env;
 		inds.fitnessScaling = exp(-(((P - P_O)^2) / ((2)*(w^2))));
-	}	
+	}
 	if(sim.cycle > 100000){
 		V_E = (V_G-hsq_new*V_G)/hsq_new;
 		env = rnorm(size(inds), 0.0, sqrt(V_E));

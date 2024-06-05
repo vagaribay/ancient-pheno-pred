@@ -1,4 +1,3 @@
-// QTL-based model assuming stabilizing selection w an abrupt change in the environment distribution
 // Valeria Añorve-Garibay
 // SLiM version 4.1
 // No scaling factor
@@ -6,23 +5,17 @@
 initialize() {
 	
 	initializeMutationRate(1e-08);
-	
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/changing_env/mid/VEx2/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/changing_env/mid/VEb2/");
-	//defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/changing_env/mid/ENVx3/");
-	defineConstant("path", "/mnt/Timina/dortega/vanorve/ancient-pheno-pred/output/changing_env/mid/ENVx30/");
-	
- 	// VS: the sum of the variance in fitness plus the environmental variance in phenotype
-	defineConstant("VS", 1.0);
 
-	catn("Changing environment: " + "hsq = " + hsq + "\n");
-		
-	// QTLs
-	initializeMutationType("m1", 0.5, "f", 0.0); // neutral
-	initializeMutationType("m2", 0.5, "n", 0.0, 0.25); // QTL
-	m2.convertToSubstitution == F;
+	defineConstant("P_O", 0.0);
+	defineConstant("w", 1.0);
+
+	//catn("Directional selection: " + "hsq = " + hsq + " QTLs sd = " + QTL_sd + "\n");
 	
-	initializeGenomicElementType("g1", c(m2), c(1));
+	// QTLs
+	initializeMutationType("m1", 0.5, "n", 0.0, 0.25); // QTL
+	m1.convertToSubstitution == F;
+	
+	initializeGenomicElementType("g1", c(m1), c(1));
 	
 	// exons aka 20 independent genes
 	rec_ends = NULL;
@@ -37,76 +30,49 @@ initialize() {
 	initializeRecombinationRate(rec_rates, rec_ends);
 }
 
+mutationEffect(m1) { return 1.0; }
+
 // burn-in for ancestral population
-1 late(){
+1 early(){
 	// save this run's identifier, used to save and restore
 	defineConstant("simID", getSeed());
 	sim.addSubpop("p1", 10000); }
 
 1: late() {
-
-	inds = sim.subpopulations.individuals;
-	additive = inds.sumOfMutationsOfType(m2);
+	
+	inds = p1.individuals;
+	// sum the additive effect sizes of QTLs
+	G = inds.sumOfMutationsOfType(m1);
+	// model environmental variance according to target hsq
 	// H2 = VA / VA + VE
-	V_A = sd(additive)^2;
- 
- // 1. environmental change modeled as a change in the environmental variance
- if(m_change == 0){
-   // during the burn-in period, environmental variance remains unchanged
-   if(sim.cycle <= 100000){
-  		V_E=(V_A-hsq*V_A)/hsq;
-   }
-   // right after the burn-in, the environmental variance is changed by multiplying/dividing it by 2 to mimick an environmental change
-   if(sim.cycle > 100000){
-     if(m_change_by_2 == 0){
-       V_E=((V_A-hsq*V_A)/hsq)*2;
-     }
-     if(m_change_by_2 == 1){
-     V_E=((V_A-hsq*V_A)/hsq)/2;
-     }
-   }
-   env = rnorm(size(inds), 0.0, sqrt(V_E));
-   pheno = additive + env;
-   estimated_hsq = var(additive) / var(pheno);
-   // stabilizing selection
-   // based on w fitness equation defined by Kevin R. Thornton., 2019 and based on Burger (2000)
-   inds.fitnessScaling = exp(-(((pheno - 0.0)^(2)) / (2)*(VS)));
-   inds.tagF = pheno;
- }
- 
- // 2. environmental change modeled as a in the contribution of the environment to the phenotype
- if(m_change == 1){
-   V_E=(V_A-hsq*V_A)/hsq;
-   env = rnorm(size(inds), 0.0, sqrt(V_E));
-   // during the burn-in period, the environment contribution to the phenotype remains unchanged
-   if(sim.cycle <= 100000){
-     pheno = additive + env;
-   }
-   // rigth after the burn-in, the environment contribution to the phenotype is multiplied by X
-   if(sim.cycle > 100000){
-     pheno = additive + env + V_E*env_var;
-   }
-   estimated_hsq = var(additive) / var(pheno);
-   // stabilizing selection
-	// based on w fitness equation defined by Kevin R. Thornton., 2019 and based on Burger (2000)
-	inds.fitnessScaling = exp(-(((pheno - 0.0)^(2)) / (2)*(VS)));
-	inds.tagF = pheno;
- }
-
- if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
-	{
-		catn(sim.cycle + ": mean pheno == " + mean(pheno) + ", hsq == " + estimated_hsq);
+	V_G = sd(G)^2;
+	if(sim.cycle <= 100000){
+		defineConstant("hsq", 0.5);
+		V_E = (V_G-hsq*V_G)/hsq;
+		env = rnorm(size(inds), 0.0, sqrt(V_E));
+		P = G + env;
+		inds.fitnessScaling = exp(-(((P - P_O)^2) / ((2)*(w^2))));
+	}	
+	if(sim.cycle > 100000){
+		V_E = (V_G-hsq_new*V_G)/hsq_new;
+		env = rnorm(size(inds), 0.0, sqrt(V_E));
+		P = G + env;
+		inds.fitnessScaling = exp(-(((P - P_O)^2) / ((2)*(w^2))));
 	}
- 
+	inds.tagF = P;
 }
 
-mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selection coefficients of m2 mutations
+100000:100400 late() {
+	mean_pheno =  mean(p1.individuals.tagF);
+	var_pheno = var(p1.individuals.tagF);
+	catn(sim.cycle + ": m == " + mean_pheno + ", v == " + var_pheno);
+}
 
 100000:100400 late() {
 	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
-
-		QTLs = sim.mutationsOfType(m2);
+		
+		QTLs = sim.mutationsOfType(m1);
 		f = sim.mutationFrequencies(NULL, QTLs);
 		s = QTLs.selectionCoeff;
 		p = QTLs.position;
@@ -119,11 +85,12 @@ mutationEffect(m2) { return 1.0; } // this call tells SLiM to ignore the selecti
 		file = paste0(lines);
 		file = "position\tselcoeff\tfreq\n" + file;
 		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
-
+		
 		sample = sample(p1.individuals, 100);
 		sample_pheno = sample.tagF;
 		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
-		sample.genomes.outputVCF(path + "outVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", simplifyNucleotides = T);
 		sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+		all_inds = p1.individuals.genomes;
+		all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
 }

@@ -71,7 +71,7 @@ mutationEffect(m1) { return 1.0; }
 }
 
 100000:100400 late() {
-	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
+	if(sim.cycle == 100000 | sim.cycle == 100010 | sim.cycle == 100020 | sim.cycle == 100030 | sim.cycle == 100040 | sim.cycle == 100050 | sim.cycle == 100060 | sim.cycle == 100070 | sim.cycle == 100080 | sim.cycle == 100090 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
 	{
 		
 		QTLs = sim.mutationsOfType(m1);
@@ -96,4 +96,3 @@ mutationEffect(m1) { return 1.0; }
 		all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
 }
-

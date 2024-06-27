@@ -144,3 +144,76 @@ DTWF.plt = ggplot(DTWF, aes(x = freq, y = fg0, color = generation)) +
 
 Fig_2_2 = ggarrange(frq.plt, DTWF.plt, ncol = 1, labels = c("A", "B"), align = "hv")
 ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_2_2.png", Fig_2_2, width = 10, height = 8, dpi = 300)
+
+
+################################################################################################################################################################################################
+################################################################################################################################################################################################
+################################################################################################################################################################################################
+# Ratio of Conserved QTLs / Total QTLs: all evolutionary dynamics
+# Neutral Evolution
+fname = "tPheno_aPS"
+NULL.QTL = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/neutral_evolution/metrics/", fname, "_0.8-0.8-0.1.QTLs", sep = ""), header = TRUE)
+NULL.QTL = NULL.QTL[which(NULL.QTL$hsq == "total"),]
+NULL.QTL$bin = factor(NULL.QTL$bin, levels = unique(NULL.QTL$bin))
+NULL.QTL.C = NULL.QTL[which(NULL.QTL$group == "conserved"),]
+NULL.coeff.plt = ggplot(NULL.QTL.C, aes(x = bin, y = coeff)) +
+  geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8) +
+  theme_linedraw() +
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(size = 14),
+        legend.title = element_text(hjust = 0.5, size = 12),
+        legend.text = element_text(size = 12),
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)",  y = "Conserved QTLs / Conserved QTLs + Lost QTLs", title = "Neutral Evolution")
+
+# Stabilizing Selection
+# Effect Sizes
+STABS.QTL = read.table("/Users/valeriagby/desktop/ancient-pheno-prediction/output/stabilizing_selection/metrics/QTLs_summ.txt", header = TRUE)
+STABS.QTL = STABS.QTL[which(STABS.QTL$hsq == "total" & STABS.QTL$w == 1),]
+STABS.QTL$bin = factor(STABS.QTL$bin, levels = unique(STABS.QTL$bin))
+STABS.QTL.C = STABS.QTL[which(STABS.QTL$group == "conserved"),]
+STAB.coeff.plt = ggplot(STABS.QTL.C, aes(x = bin, y = coeff)) +
+  geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8) +
+  theme_linedraw() +
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(size = 14),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 12),
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / Conserved QTLs + Lost QTLs", title = "Stabilizing Selection")
+
+# Directional Selection
+DIR.QTL.0025 = data.frame()
+for (genbp in c(400,300,200,100,0)) {
+  tmp.0025 = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/directional_selection/metrics/QTLs_summ_0025_0_", genbp, ".txt", sep = ""), header = TRUE, colClasses = c("integer", "character", "integer", "character", "character", "integer", "character", "numeric"))
+  tmp.0025$gbp = genbp
+  DIR.QTL.0025 = rbind(DIR.QTL.0025, tmp.0025)
+}
+DIR.QTL.0025 = DIR.QTL.0025[which(DIR.QTL.0025$hsq == "total" & DIR.QTL.0025$gbp == "400"),]
+DIR.QTL.0025$bin = factor(DIR.QTL.0025$bin, levels = unique(DIR.QTL.0025$bin))
+DIR.QTL.0025.C = DIR.QTL.0025[which(DIR.QTL.0025$group == "conserved"),]
+DIR.coeff.plt = ggplot(DIR.QTL.0025.C, aes(x = bin, y = coeff)) +
+  geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8) +
+  theme_linedraw() +
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(size = 14),
+        legend.position = "left",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 12),
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / Conserved QTLs + Lost QTLs", title = "Directional Selection")
+
+Fig_7 = ggarrange(NULL.coeff.plt, STAB.coeff.plt, DIR.coeff.plt, ncol = 3,
+          align = "hv", labels = c("A", "B", "C"))
+ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_7.png", Fig_7, width = 15, height = 6, dpi = 300)
+
+
+
+
+

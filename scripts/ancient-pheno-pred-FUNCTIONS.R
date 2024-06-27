@@ -1,3 +1,4 @@
+# author: Valeria Añorve-Garibay
 # compute ancient-polygenic scores
 compute_aPS = function(nrep, path){
   

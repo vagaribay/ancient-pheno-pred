@@ -1,3 +1,5 @@
+# author: Valeria Añorve-Garibay
+
 library(vcfR)
 library(stringr)
 library(hash)

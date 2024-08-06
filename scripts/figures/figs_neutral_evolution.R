@@ -44,7 +44,7 @@ NULL.mse.plt = ggplot(NULL.mse, aes(x = generation, y = MSE, fill = hsq)) +
   scale_fill_manual(values = c("#CC79A7", "#F0E442"), labels = c("1.0", "0.5")) + ylim(0,30)
 
 Fig_2 = ggarrange(NULL.corr.plt, NULL.mse.plt, common.legend = TRUE, ncol = 2, legend = "left", labels = c("A", "B"))
-ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_2.png", Fig_2, width = 9, height = 4, dpi = 300)
+#ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_2.png", Fig_2, width = 9, height = 4, dpi = 300)
 
 # QTL: effect sizes
 fname = "tPheno_aPS"
@@ -85,9 +85,9 @@ RATIO = ggplot(NULL.QTL.plt.C, aes(x = bin, y = coeff, fill = hsq)) +
         legend.position = "left",
         legend.title = element_text(hjust = 0.5, size = 12),
         legend.text = element_text(size = 12),
-        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)",  y = "Conserved QTLs / Conserved QTLs + Lost QTLs", fill = expression(h^2)) +
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)",  y = "Conserved QTLs / (Conserved QTLs + Lost QTLs)", fill = expression(h^2)) +
   scale_fill_manual(values = c("#CC79A7", "#F0E442"), labels = c("1.0", "0.5"))
-  
+
 Fig_2_1 = ggarrange(NULL.QTL.EZ, RATIO, ncol = 1, align = "v", labels = c("A", "B"))
 ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_2_1.png", Fig_2_1, width = 12, height = 10, dpi = 300)
 
@@ -166,7 +166,7 @@ NULL.coeff.plt = ggplot(NULL.QTL.C, aes(x = bin, y = coeff)) +
         strip.text = element_text(size = 14),
         legend.title = element_text(hjust = 0.5, size = 12),
         legend.text = element_text(size = 12),
-        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)",  y = "Conserved QTLs / Conserved QTLs + Lost QTLs", title = "Neutral Evolution")
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)",  y = "Conserved QTLs / (Conserved QTLs + Lost QTLs)", title = "Neutral Evolution")
 
 # Stabilizing Selection
 # Effect Sizes
@@ -184,7 +184,7 @@ STAB.coeff.plt = ggplot(STABS.QTL.C, aes(x = bin, y = coeff)) +
         strip.text = element_text(size = 14),
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
-        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / Conserved QTLs + Lost QTLs", title = "Stabilizing Selection")
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / (Conserved QTLs + Lost QTLs)", title = "Stabilizing Selection")
 
 # Directional Selection
 DIR.QTL.0025 = data.frame()
@@ -207,11 +207,13 @@ DIR.coeff.plt = ggplot(DIR.QTL.0025.C, aes(x = bin, y = coeff)) +
         legend.position = "left",
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
-        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / Conserved QTLs + Lost QTLs", title = "Directional Selection")
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / (Conserved QTLs + Lost QTLs)", title = "Directional Selection")
 
 Fig_7 = ggarrange(NULL.coeff.plt, STAB.coeff.plt, DIR.coeff.plt, ncol = 3,
-          align = "hv", labels = c("A", "B", "C"))
+                  align = "hv", labels = c("A", "B", "C"))
 ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_7.png", Fig_7, width = 15, height = 6, dpi = 300)
+
+
 
 
 

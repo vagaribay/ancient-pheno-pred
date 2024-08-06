@@ -1,5 +1,5 @@
 # author: Valeria Añorve-Garibay
-# Neutral Evolution: Figures
+# Stabilizing Selection: Figures
 
 library(ggplot2)
 library(dplyr)
@@ -8,58 +8,132 @@ options(scipen = 999)
 
 fname = "tPheno_aPS"
 
-# aPS accuracy
-NULL.corr = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/neutral_evolution/metrics/", fname, ".cor", sep = ""), header = TRUE)
-NULL.corr$generation = factor(NULL.corr$generation, levels = c(400, 300, 200, 100, 0))
-NULL.corr$hsq = factor(NULL.corr$hsq, levels = c("total", "mid"))
-NULL.corr$r.squared = (NULL.corr$corr)^2
-NULL.corr.plt = ggplot(NULL.corr, aes(x = generation, y = r.squared, fill = hsq)) +
-  geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8, position = position_dodge(0.8)) +
-  theme_linedraw() + 
-  theme(axis.text = element_text(size = 12),
-        axis.title = element_text(size = 14),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "left",
-        legend.title = element_text(hjust = 0.5, size = 12),
-        legend.text = element_text(size = 12)) +
-  labs(title = "aPS accuracy", x = expression("generations before the present, " ~ tau), y = expression(italic(r)^2(Y[j], hat(Y)[j]), list(j == "")), fill = expression(h^2)) +
-  scale_fill_manual(values = c("#CC79A7", "#F0E442"), labels = c("1.0", "0.5")) + ylim(0,1)
-
-# aPS MSE
-NULL.mse = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/neutral_evolution/metrics/", fname, ".mse", sep = ""), header = TRUE)
-NULL.mse$generation = factor(NULL.mse$generation, levels = c(400, 300, 200, 100, 0))
-NULL.mse$hsq = factor(NULL.mse$hsq, levels = c("total", "mid"))
-NULL.mse.plt = ggplot(NULL.mse, aes(x = generation, y = MSE, fill = hsq)) +
-  geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8, position = position_dodge(0.8)) +
-  theme_linedraw() + 
-  theme(axis.text = element_text(size = 12),
-        axis.title = element_text(size = 14),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position = "left",
-        legend.title = element_text(hjust = 0.5, size = 12),
-        legend.text = element_text(size = 12)) + 
-  labs(title = "aPS MSE", x = expression("generations before the present, " ~ tau), y = expression(italic(MSE)(Y[j], hat(Y)[j]), list(j == "")), fill = expression(h^2)) +
-  scale_fill_manual(values = c("#CC79A7", "#F0E442"), labels = c("1.0", "0.5")) + ylim(0,30)
-
-Fig_2 = ggarrange(NULL.corr.plt, NULL.mse.plt, common.legend = TRUE, ncol = 2, legend = "left", labels = c("A", "B"))
-ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_2.png", Fig_2, width = 9, height = 4, dpi = 300)
-
-# QTL: effect sizes
-fname = "tPheno_aPS"
-NULL.QTL = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/neutral_evolution/metrics/", fname, "_0.8-0.8-0.1.QTLs", sep = ""), header = TRUE)
-NULL.QTL$bin = factor(NULL.QTL$bin, levels = unique(NULL.QTL$bin))
-NULL.QTL$hsq = factor(NULL.QTL$hsq, levels = c("total", "mid"))
-NULL.QTL.plt = NULL.QTL %>%
+# aPS correlation
+STABS.corr = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/stabilizing_selection/metrics/", fname, ".cor", sep = ""), header = TRUE)
+STABS.corr$generation = factor(STABS.corr$generation, levels = c(400, 300, 200, 100, 0))
+STABS.corr$hsq = factor(STABS.corr$hsq, levels = c("total", "mid"))
+STABS.corr$w = factor(STABS.corr$w)
+STABS.corr$r.squared = (STABS.corr$corr)^2
+STABS.corr = STABS.corr %>%
   mutate(hsq_math = factor(hsq,
                            levels = c("total", "mid"),
                            labels = c(expression(h^2 == 1), expression(h^2 == 0.5))))
+STABS.corr.plt = ggplot(STABS.corr, aes(x = generation, y = r.squared, fill = w)) +
+  geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8) +
+  theme_linedraw() +
+  facet_wrap(. ~ hsq_math, labeller = label_parsed) +
+  theme_linedraw() + 
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 15),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "left",
+        legend.title = element_text(hjust = 0.5, size = 12),
+        legend.text = element_text(size = 12),
+        strip.text.x = element_text(size = 14)) +
+  labs(title = "aPS accuracy", x = expression("generations before the present, " ~ tau), y = expression(italic(r)^2(Y[j], hat(Y)[j]), list(j == "")), fill = expression(italic(w))) +
+  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#CC79A7")) + ylim(0,1)
 
-NULL.QTL.EZ = ggplot(NULL.QTL.plt, aes(x = bin, y = nQTLs, fill = group)) +
+# aPS MSE
+STABS.mse = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/stabilizing_selection/metrics/", fname, ".mse", sep = ""), header = TRUE)
+STABS.mse$generation = factor(STABS.mse$generation, levels = c(400, 300, 200, 100, 0))
+STABS.mse$hsq = factor(STABS.mse$hsq, levels = c("total", "mid"))
+STABS.mse$w = factor(STABS.mse$w)
+STABS.mse = STABS.mse %>%
+  mutate(hsq_math = factor(hsq,
+                           levels = c("total", "mid"),
+                           labels = c(expression(h^2 == 1), expression(h^2 == 0.5))))
+STABS.mse.plt = ggplot(STABS.mse, aes(x = generation, y = round(MSE,2), fill = w)) +
+  geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8) +
+  theme_linedraw() +
+  facet_wrap(. ~ hsq_math, labeller = label_parsed) +
+  theme_linedraw() + 
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 15),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "left",
+        legend.title = element_text(hjust = 0.5, size = 12),
+        legend.text = element_text(size = 12),
+        strip.text.x = element_text(size = 14)) +
+  labs(title = "aPS MSE", x = expression("generations before the present, " ~ tau), y = expression(italic(MSE)(Y[j], hat(Y)[j]), list(j == "")), fill = expression(italic(w))) +
+  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#CC79A7")) + ylim(0,1.5)
+
+Fig_3 = ggarrange(STABS.corr.plt, STABS.mse.plt, common.legend = TRUE, ncol = 1, legend = "left", labels = c("A", "B"))
+#ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_3.png", Fig_3, width = 8, height = 6.5, dpi = 300)
+
+# lm for tpheno & aPS 
+data = data.frame()
+lm.1.slope = c()
+lm.1.rsquared = c()
+lm.5.slope = c()
+lm.5.rsquared = c()
+for (gen in c(100400, 100300, 100200, 100100, 100000)) {
+  tpheno.1.tmp = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/stabilizing_selection/total/1/tpheno_", gen, "_33.txt", sep = ""), header = FALSE, col.names = "tpheno")
+  aPS.1.tmp = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/stabilizing_selection/total/1/aPs_", gen, "_33.txt", sep = ""), header = FALSE, col.names = "aPS")
+  
+  tpheno.5.tmp = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/stabilizing_selection/total/5/tpheno_", gen, "_33.txt", sep = ""), header = FALSE, col.names = "tpheno")
+  aPS.5.tmp = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/stabilizing_selection/total/5/aPs_", gen, "_33.txt", sep = ""), header = FALSE, col.names = "aPS")
+  
+  tmp.1 = cbind(tpheno.1.tmp, aPS.1.tmp)
+  tmp.1$w = "1"
+  tmp.5 = cbind(tpheno.5.tmp, aPS.5.tmp)
+  tmp.5$w = "5"
+  
+  lm.tmp.1 = lm(aPS ~ tpheno, data = tmp.1)
+  lm.1.slope = c(lm.1.slope, coef(lm.tmp.1)[2])
+  lm.1.rsquared = c(lm.1.rsquared, summary(lm.tmp.1)$r.squared)
+  
+  lm.tmp.5 = lm(aPS ~ tpheno, data = tmp.5)
+  lm.5.slope = c(lm.5.slope, coef(lm.tmp.5)[2])
+  lm.5.rsquared = c(lm.5.rsquared, summary(lm.tmp.5)$r.squared)
+  
+  tmp = rbind(tmp.1, tmp.5)
+  pgen = abs(gen - 100400)
+  tmp$gen = pgen
+  data = rbind(data, tmp)
+}
+
+data = data %>%
+  mutate(w_math = factor(w,
+                         levels = c(1, 5),
+                         labels = c(expression(italic(w) == 1), expression(italic(w) == 5))))
+lmTphenoAPS = ggplot(data, aes(x = tpheno, y = aPS)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "red", lwd = 1, se = FALSE) +
+  facet_grid(rows = vars(gen), cols = vars(w_math), scales="free_y", switch = 'y', labeller = label_parsed) +
+  theme_linedraw() +
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(size = 14),
+        legend.position = "left",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 12),
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "true phenotype", y = "ancient polygenic score (aPS)") + ylim(-2.2,2.2)
+
+ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/output/figures/Figure_3_Supp_1.png", lmTphenoAPS, width = 8, height = 5, dpi = 300)
+
+# QTL: effect sizes
+STABS.QTL = read.table("/Users/valeriagby/desktop/ancient-pheno-prediction/output/stabilizing_selection/metrics/QTLs_summ.txt", header = TRUE)
+STABS.QTL$bin = factor(STABS.QTL$bin, levels = unique(STABS.QTL$bin))
+STABS.QTL$hsq = factor(STABS.QTL$hsq, levels = c("total", "mid"))
+STABS.QTL$w = factor(STABS.QTL$w)
+STABS.QTL = STABS.QTL %>%
+  mutate(hsq_math = factor(hsq,
+                           levels = c("total", "mid"),
+                           labels = c(expression(h^2 == 1), expression(h^2 == 0.5))))
+STABS.QTL = STABS.QTL %>%
+  mutate(w_math = factor(w,
+                         levels = 1:5,
+                         labels = c(expression(italic(w) == 1), expression(italic(w) == 2), expression(italic(w) == 3), expression(italic(w) == 4), expression(italic(w) == 5))))
+
+STABS.QTL.plt = ggplot(STABS.QTL, aes(x = bin, y = nQTLs, fill = group)) +
   geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8) +
   theme_linedraw() + 
-  facet_wrap(~hsq_math, labeller = label_parsed) +
+  facet_grid(rows = vars(hsq_math), cols = vars(w_math), scales="free_y", switch = 'y',
+             labeller = label_parsed) +
   theme(axis.text = element_text(size = 10),
         axis.title = element_text(size = 14),
         panel.grid.major = element_blank(),
@@ -69,78 +143,76 @@ NULL.QTL.EZ = ggplot(NULL.QTL.plt, aes(x = bin, y = nQTLs, fill = group)) +
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
         axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "number of QTL mutations") +
-  scale_fill_manual(values = c("#D55E00", "#56B4E9"), labels = c("Conserved", "Lost"))
+  scale_fill_manual(values = c("#D55E00", "#56B4E9"), labels = c("Conserved", "Lost")) + ylim(0,150)
 
-
-NULL.QTL.plt.C = NULL.QTL.plt[which(NULL.QTL.plt$group == "conserved"),]
-RATIO = ggplot(NULL.QTL.plt.C, aes(x = bin, y = coeff, fill = hsq)) +
+STABS.QTL.C = STABS.QTL[which(STABS.QTL$group == "conserved"),]
+RATIO = ggplot(STABS.QTL.C, aes(x = bin, y = coeff, fill = w)) +
   geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8) +
   theme_linedraw() +
-  facet_wrap(~hsq_math, labeller = label_parsed) +
+  facet_grid(rows = vars(hsq_math), cols = vars(w_math), scales="free_y", switch = 'y',
+             labeller = label_parsed) +
   theme(axis.text = element_text(size = 10),
         axis.title = element_text(size = 14),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.text = element_text(size = 14),
         legend.position = "left",
-        legend.title = element_text(hjust = 0.5, size = 12),
+        legend.title = element_blank(),
         legend.text = element_text(size = 12),
-        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)",  y = "Conserved QTLs / Conserved QTLs + Lost QTLs", fill = expression(h^2)) +
-  scale_fill_manual(values = c("#CC79A7", "#F0E442"), labels = c("1.0", "0.5"))
-  
-Fig_2_1 = ggarrange(NULL.QTL.EZ, RATIO, ncol = 1, align = "v", labels = c("A", "B"))
-ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_2_1.png", Fig_2_1, width = 12, height = 10, dpi = 300)
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / (Conserved QTLs + Lost QTLs)") +
+  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#CC79A7"))
 
-# QTL: frequencies
+Fig_3_2 = ggarrange(STABS.QTL.plt, RATIO, ncol = 1, align = "v", labels = c("A", "B"))
+ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_3_2.png", Fig_3_2, width = 15, height = 12, dpi = 300)
+
+####################################################################################
+
+library(ggplot2)
+library(dplyr)
+library(ggpubr)
+
+options(scipen = 999)
+
+# Stabilizing Selection with real parameters by Sanjak et al
 fname = "tPheno_aPS"
-NULL.QTL.frq = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/neutral_evolution/metrics/", fname, "_0-1-0.001.QTLs.frq", sep = ""), header = TRUE)
-NULL.QTL.frq.L = NULL.QTL.frq[which(NULL.QTL.frq$hsq == "total" & NULL.QTL.frq$group == "lost"),]
-NULL.QTL.frq.L$bin = factor(NULL.QTL.frq.L$bin, levels = unique(NULL.QTL.frq.L$bin))
-percent_bin = c()
-max_n = c()
-for (bin in levels(NULL.QTL.frq.L$bin)) {
-  percent_bin = c(percent_bin, (sum(NULL.QTL.frq.L[which(NULL.QTL.frq.L$bin == bin),"nQTLs"]) / sum(NULL.QTL.frq.L$nQTLs)) * 100)
-  max_n = c(max_n, max(NULL.QTL.frq.L[which(NULL.QTL.frq.L$bin == bin),"nQTLs"]))
-}
-annot_text = data.frame(bin = levels(NULL.QTL.frq.L$bin)[0:20], label = cumsum(percent_bin)[0:20], y = max_n[0:20])
-NULL.QTL.frq.L.tmp = NULL.QTL.frq.L[1:2000,]
-NULL.QTL.frq.L.tmp$bin = factor(NULL.QTL.frq.L.tmp$bin, levels = unique(NULL.QTL.frq.L.tmp$bin))
-frq.plt = ggplot(NULL.QTL.frq.L.tmp, aes(x = bin, y = nQTLs)) +
-  geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8, fill = "#56B4E9") +
-  geom_hline(yintercept = 75, linetype = "dashed", color = "gray70") +
-  theme_linedraw() + 
-  theme(axis.text = element_text(size = 12),
-        axis.title = element_text(size = 14),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "frequency", y = "number of QTL mutations") + ylim(0,100) +
-  geom_text(data = data.frame(), aes(x = annot_text$bin , y = 78, 
-                                     label = paste(round(annot_text$label, 1), "%", sep = "")), size = 3.2)
 
-# DTWF: prob of transitioning from f = X to f = 0
-DTWF = read.table("/Users/valeriagby/desktop/ancient-pheno-prediction/scripts/fastDTWF/DTWF_seq_0_02_OUT.txt", header = FALSE)
-probs = seq(0, 20000, 1) / 20000
-colnames(DTWF) = c("freq", "generation", paste("fg", probs, sep = ""))
-DTWF$rowSums = rowSums(DTWF[,-which(names(DTWF) %in% c("freq", "generation"))])
-DTWF$probSeg = rowSums(DTWF[,-which(names(DTWF) %in% c("freq", "generation", "fg0", "rowSums"))])
-
-# probability of transitioning from f% to 0%
-# probability of lossing allele A
-DTWF$generation = factor(DTWF$generation)
-DTWF.plt = ggplot(DTWF, aes(x = freq, y = fg0, color = generation)) +
-  geom_line() + geom_point() +
+# aPS correlation
+STABS.corr = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/real_estimates/metrics/", fname, ".cor", sep = ""), header = TRUE)
+STABS.corr$generation = factor(STABS.corr$generation, levels = c(400, 300, 200, 100, 0))
+STABS.corr$pheno = factor(STABS.corr$hsq, levels = c("height", "bmi"))
+STABS.corr$r.squared = (STABS.corr$corr)^2
+corr.real = ggplot(STABS.corr, aes(x = generation, y = r.squared, fill = pheno)) +
+  geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8) +
   theme_linedraw() + 
   theme(axis.text = element_text(size = 12),
         axis.title = element_text(size = 15),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        legend.position = "right",
+        legend.position = "left",
         legend.title = element_text(hjust = 0.5, size = 12),
         legend.text = element_text(size = 12),
-        axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(title = "", x = "frequency", main = "probability of transitioning from f freq to f = 0 freq", color = "", y = "probability") +
-  scale_color_manual(values = c("#CC6677", "#DDCC77", "#6699CC", "#009E73"), labels = c(100, 200, 300, 400)) + ylim(0,1) +
-  scale_x_continuous(breaks = seq(0,0.02,0.001))
+        strip.text.x = element_text(size = 14)) +
+  labs(title = "aPS accuracy", x = expression("generations before the present, " ~ tau), y = expression(italic(r)^2(Y[j], hat(Y)[j]), list(j == "")), fill = "") +
+  scale_fill_manual(values = c("#DDCC77", "#44AA99"), labels = c("Height", "BMI")) + ylim(0,1)
 
-Fig_2_2 = ggarrange(frq.plt, DTWF.plt, ncol = 1, labels = c("A", "B"), align = "hv")
-ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_2_2.png", Fig_2_2, width = 10, height = 8, dpi = 300)
+# aPS MSE
+STABS.mse = read.table(paste("/Users/valeriagby/desktop/ancient-pheno-prediction/output/real_estimates/metrics/", fname, ".mse", sep = ""), header = TRUE)
+STABS.mse$generation = factor(STABS.mse$generation, levels = c(400, 300, 200, 100, 0))
+STABS.mse$pheno = factor(STABS.mse$hsq, levels = c("height", "bmi"))
+
+mse.real = ggplot(STABS.mse, aes(x = generation, y = round(MSE,2), fill = pheno)) +
+  geom_boxplot(outlier.shape = 3, outlier.color = "red", outlier.size = 0.8) +
+  theme_linedraw() + 
+  theme(axis.text = element_text(size = 12),
+        axis.title = element_text(size = 15),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "left",
+        legend.title = element_text(hjust = 0.5, size = 12),
+        legend.text = element_text(size = 12),
+        strip.text.x = element_text(size = 14)) +
+  labs(title = "aPS MSE", x = expression("generations before the present, " ~ tau), y = expression(italic(MSE)(Y[j], hat(Y)[j]), list(j == "")), fill = "") +
+  scale_fill_manual(values = c("#DDCC77", "#44AA99"), labels = c("Height", "BMI")) + ylim(0,1.5)
+
+Fig_6 = ggarrange(corr.real, mse.real, common.legend = TRUE, ncol = 2, legend = "left", labels = c("A", "B"))
+ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_6.png", real.plt, width = 9, height = 4, dpi = 300)

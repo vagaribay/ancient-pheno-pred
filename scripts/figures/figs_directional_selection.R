@@ -53,7 +53,7 @@ mean.plt = ggplot(data.plt, aes(x = gen-100000, y = mean, color = QTLsSD)) +
   labs(title = "", x = "generations since optimum shift", y = expression(mean(bar(Y)[j])), color = expression("QTLs " * sigma * "")) +
   scale_color_manual(values = c("#E69F00", "#F0E442", "#009E73"), labels = c("0.25", "0.025", "0.0025")) + ylim(0,1) +
   scale_y_continuous(breaks = seq(0,1,0.2))
-  
+
 var.plt = ggplot(data.plt, aes(x = gen-100000, y = var, color = QTLsSD)) +
   geom_point() +
   theme_linedraw() + 
@@ -248,10 +248,10 @@ RATIO = ggplot(DIR.QTL.025.C, aes(x = bin, y = coeff)) +
         legend.position = "left",
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
-        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / Conserved QTLs + Lost QTLs")
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / (Conserved QTLs + Lost QTLs)")
 
-#supp = ggarrange(DIR.QTL.025.plt, RATIO, ncol = 1, align = "v", labels = c("A", "B"))
-#ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/output/figures/Figure5_Supp_X.png", supp, dpi = 300, width = 25, height = 15)
+supp = ggarrange(DIR.QTL.025.plt, RATIO, ncol = 1, align = "v", labels = c("A", "B"))
+ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_S10.png", supp, dpi = 300, width = 25, height = 15)
 
 ######################################################################
 ######################################################################
@@ -302,10 +302,10 @@ RATIO = ggplot(DIR.QTL.0025.C, aes(x = bin, y = coeff)) +
         legend.position = "left",
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
-        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / Conserved QTLs + Lost QTLs")
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / (Conserved QTLs + Lost QTLs)")
 
-#supp = ggarrange(DIR.QTL.0025.plt, RATIO, ncol = 1, align = "v", labels = c("A", "B"))
-#ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/output/figures/Figure5_Supp_7.png", supp, width = 15, height = 12, dpi = 300)
+supp = ggarrange(DIR.QTL.0025.plt, RATIO, ncol = 1, align = "v", labels = c("A", "B"))
+ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_S12.png", supp, width = 15, height = 12, dpi = 300)
 
 # 0.0025
 DIR.QTL.00025 = DIR.QTL.00025[which(DIR.QTL.00025$hsq == "mid"),]
@@ -346,7 +346,7 @@ RATIO = ggplot(DIR.QTL.00025.C, aes(x = bin, y = coeff)) +
         legend.position = "left",
         legend.title = element_blank(),
         legend.text = element_text(size = 12),
-        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / Conserved QTLs + Lost QTLs")
+        axis.text.x = element_text(angle = 90, hjust = 1)) + labs(x = "effect size (s)", y = "Conserved QTLs / (Conserved QTLs + Lost QTLs)")
 
-#supp = ggarrange(DIR.QTL.00025.plt, RATIO, ncol = 1, align = "v", labels = c("A", "B"))
-#ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/output/figures/Figure5_Supp_9.png", supp, width = 15, height = 12, dpi = 300)
+supp = ggarrange(DIR.QTL.00025.plt, RATIO, ncol = 1, align = "v", labels = c("A", "B"))
+ggsave("/Users/valeriagby/desktop/ancient-pheno-prediction/figures/Figure_S14.png", supp, width = 15, height = 12, dpi = 300)

@@ -1,4 +1,5 @@
 #!/bin/bash
+# code to simulate any evolutionary dynamic based on SLiM scripts
 TYPE=$1
 
 if [ "$TYPE" == "neutral_evolution" ]; then

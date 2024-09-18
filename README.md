@@ -1,5 +1,3 @@
-Code associated to Añorve-Garibay et al., XXX.
-
 simulations/ contain all the scripts to replicate the simulations performed in this analysis. For details on running each script see simulations/sim_any_evo_dynamic.sh.
 
 scripts/ contain all the scripts to replicate the ancient-phenotype prediction analyses performed for each simulation.

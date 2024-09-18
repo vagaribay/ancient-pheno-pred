@@ -13,19 +13,6 @@ mu_torch = torch.tensor(mu, dtype=torch.float64)
 # no strength of selection against the "1" allele in heterozygotes/homozygotes
 s_het = torch.tensor(0, dtype=torch.float64)
 
-# SFS assuming neutrality: xi = thetha * 1/i, x = (x1,...,xn-1)
-# theta = 2Nμ; assuming haploids and a locus size of 500,000 bp (20 regions of 25000 bp)
-# theta = 4NμL
-#theta = 4*N*mu*L # 200
-
-# sfs
-#sfs = np.zeros(N+1)
-#for i in range(1, N):
-#    sfs[i] = round((theta)*(1 / i), 0)
-
-#print(sfs)
-#exit()
-
 freqs = np.round(np.arange(0, 0.021, 0.001),3)
 probs = np.arange(0, N_haploid+1) / N_haploid
 

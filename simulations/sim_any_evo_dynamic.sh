@@ -1,5 +1,9 @@
 #!/bin/bash
 # code to simulate any evolutionary dynamic based on SLiM scripts
+# TYPE defines the type of evolutionary scenario simulated.
+# The three options are "neutral_evolution", "stabilizing_selection" and "directional_selection" which defines 
+# if the trait is evolving under neutral evolution, stabilizing selection or directional selection, respectively.
+
 TYPE=$1
 
 if [ "$TYPE" == "neutral_evolution" ]; then

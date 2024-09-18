@@ -1,5 +1,5 @@
 # author: Valeria Añorve-Garibay
-
+# the following commands were used to run functions to compute polygenic scores, precision metrics (mse and r) and the number of lost / conserved QTLs per evolutionary scenario
 library(vcfR)
 library(stringr)
 library(hash)

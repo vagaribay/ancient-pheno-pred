@@ -1,0 +1,75 @@
+// author: Valeria Añorve-Garibay
+// SLiM version 4.1
+// No scaling factor
+
+initialize() {
+	initializeMutationRate(1e-08);
+	// QTLs
+	initializeMutationType("m1", 0.5, "n", 0.0, 0.25); // QTL
+	m1.convertToSubstitution == F;
+	initializeGenomicElementType("g1", c(m1), c(1));
+	rec_ends = NULL;
+	rec_rates = NULL;
+	for (index in 1:20){
+		initializeGenomicElement(g1, (index - 1 )*25000 + 2, (index - 1 )*25000 + 24999 + 2);
+		rec_ends = c( rec_ends, (index - 1)*25000 + 2);
+		rec_ends = c( rec_ends, (index - 1)*25000 + 24999 + 2);
+		rec_rates = c( rec_rates, 0.5);
+		rec_rates = c( rec_rates, 1e-08*1);
+	}
+	initializeRecombinationRate(rec_rates, rec_ends);
+}
+
+mutationEffect(m1) { return 1.0; }
+// burn-in (10N)
+1 early(){
+	// save this run's identifier, used to save and restore
+	defineConstant("simID", getSeed());
+	sim.addSubpop("p1", 10000); }
+
+1: late() {
+	inds = p1.individuals;
+	// sum the additive effect sizes of QTLs
+	G = inds.sumOfMutationsOfType(m1);
+	// model environmental variance according to target hsq
+	// H2 = VA / VA + VE
+	V_G = sd(G)^2;
+	V_E = (V_G-hsq*V_G)/hsq;
+	env = rnorm(size(inds), 0.0, sqrt(V_E));
+	P = G + env;
+	// set fitness effects based on stabilizing selection
+	//inds.fitnessScaling = exp(-(((P - P_O)^2) / ((2)*(w^2))));
+	inds.tagF = P;
+}
+
+100000:100400 late() {
+	mean_pheno =  mean(p1.individuals.tagF);
+	var_pheno = var(p1.individuals.tagF);
+	catn(sim.cycle + ": m == " + mean_pheno + ", v == " + var_pheno);
+}
+
+100000:100400 late() {
+	if(sim.cycle == 100000 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
+	{
+		QTLs = sim.mutationsOfType(m1);
+		f = sim.mutationFrequencies(NULL, QTLs);
+		s = QTLs.selectionCoeff;
+		p = QTLs.position;
+		indices = order(f, F);
+		lines = NULL;
+		for (i in indices){
+			mutLine = paste0(p[i], "\t", s[i], "\t", f[i], "\n");
+			lines = c(lines, mutLine);
+		}
+		file = paste0(lines);
+		file = "position\tselcoeff\tfreq\n" + file;
+		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
+		
+		sample = sample(p1.individuals, 100);
+		sample_pheno = sample.tagF;
+		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
+		sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+		all_inds = p1.individuals.genomes;
+		all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+	}
+}

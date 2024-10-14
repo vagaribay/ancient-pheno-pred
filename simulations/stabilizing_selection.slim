@@ -66,11 +66,27 @@ mutationEffect(m1) { return 1.0; }
 		file = "position\tselcoeff\tfreq\n" + file;
 		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
 		
+		//sample = sample(p1.individuals, 100);
+		//sample_pheno = sample.tagF;
+		//writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
+		//sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+		//all_inds = p1.individuals.genomes;
+		//all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+
+		// 100 individuals
 		sample = sample(p1.individuals, 100);
 		sample_pheno = sample.tagF;
-		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
-		sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
-		all_inds = p1.individuals.genomes;
-		all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+		writeFile(path + "100_tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
+		sample.genomes.outputVCF(path + "100_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+		// 500 individuals
+		sample = sample(p1.individuals, 500);
+		sample_pheno = sample.tagF;
+		writeFile(path + "500_tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
+		sample.genomes.outputVCF(path + "500_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+		// 1000 individuals
+		sample = sample(p1.individuals, 1000);
+		sample_pheno = sample.tagF;
+		writeFile(path + "1000_tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
+		sample.genomes.outputVCF(path + "1000_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 	}
 }

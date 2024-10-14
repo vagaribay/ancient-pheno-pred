@@ -30,3 +30,12 @@ elif [ "$TYPE" == "directional_selection" ]; then
 fi
 
 sbatch --array=1 sim_any_evo_dynamic.sh neutral_evolution 0.5 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/neutral_evolution/
+
+sbatch --array=1 sim_any_evo_dynamic.sh stabilizing_selection 0.5 1.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/stabilizing_selection/w_1/
+sbatch --array=1 sim_any_evo_dynamic.sh stabilizing_selection 0.5 5.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/stabilizing_selection/w_5/
+
+sbatch --array=1 sim_any_evo_dynamic.sh directional_selection 0.5 0.25 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/directional_selection/sd_025/
+sbatch --array=1 sim_any_evo_dynamic.sh directional_selection 0.5 0.0025 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/directional_selection/sd_00025/
+
+
+

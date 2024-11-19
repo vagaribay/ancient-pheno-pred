@@ -10,8 +10,7 @@ initialize() {
 	initializeGenomicElementType("g1", c(m1), c(1));
 	rec_ends = NULL;
 	rec_rates = NULL;
-	// for (index in 1:20){
-	for (index in 1:50){
+	for (index in 1:20){
 		initializeGenomicElement(g1, (index - 1 )*25000 + 2, (index - 1 )*25000 + 24999 + 2);
 		rec_ends = c( rec_ends, (index - 1)*25000 + 2);
 		rec_ends = c( rec_ends, (index - 1)*25000 + 24999 + 2);
@@ -66,18 +65,24 @@ mutationEffect(m1) { return 1.0; }
 		file = "position\tselcoeff\tfreq\n" + file;
 		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
 		
-		//sample = sample(p1.individuals, 100);
-		//sample_pheno = sample.tagF;
-		//writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
-		//sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+		sample = sample(p1.individuals, 100);
+		sample_pheno = sample.tagF;
+		writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
+		sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
 		//all_inds = p1.individuals.genomes;
 		//all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+
+		
+
+
 
 		// 100 individuals
 		sample = sample(p1.individuals, 100);
 		sample_pheno = sample.tagF;
 		writeFile(path + "100_tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
 		sample.genomes.outputVCF(path + "100_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
+		
+		
 		// 500 individuals
 		sample = sample(p1.individuals, 500);
 		sample_pheno = sample.tagF;

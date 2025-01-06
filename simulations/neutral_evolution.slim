@@ -3,6 +3,7 @@
 // No scaling factor
 
 initialize() {
+	initializeTreeSeq(checkCoalescence=T);
 	initializeMutationRate(1e-08);
 	// QTLs
 	initializeMutationType("m1", 0.5, "n", 0.0, 0.25); // QTL
@@ -28,6 +29,13 @@ mutationEffect(m1) { return 1.0; }
 	sim.addSubpop("p1", 10000); }
 
 1: late() {
+	if (sim.treeSeqCoalesced())
+	{
+		catn(sim.cycle + ": COALESCED");
+	}
+}
+
+1: late() {
 	inds = p1.individuals;
 	// sum the additive effect sizes of QTLs
 	G = inds.sumOfMutationsOfType(m1);
@@ -40,6 +48,10 @@ mutationEffect(m1) { return 1.0; }
 	// set fitness effects based on stabilizing selection
 	//inds.fitnessScaling = exp(-(((P - P_O)^2) / ((2)*(w^2))));
 	inds.tagF = P;
+}
+
+100000 late() {
+	catn("NO COALESCENCE BY CYCLE 100000");
 }
 
 100000:100400 late() {

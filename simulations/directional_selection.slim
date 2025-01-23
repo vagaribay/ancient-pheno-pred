@@ -52,10 +52,10 @@ mutationEffect(m1) { return 1.0; }
 	// set fitness effects based on stabilizing selection
 	// during the burn-in period, trait will be under stabilizing selection at P_0 = 0
 	// rigth after the burn-in (10N), there is an optimum shift that pushes the effect sizes distribution towards the new optimum P_0 = 1 (directional selection)
-	if(sim.cycle <= 100000){
+	if(sim.cycle <= 200000){
 		inds.fitnessScaling = exp(-(((P - P_O)^2) / ((2)*(w^2))));
   }
-	if(sim.cycle > 100000){
+	if(sim.cycle > 200000){
 		inds.fitnessScaling = exp(-(((P - P_O_new)^2) / ((2)*(w^2))));
 	}
 	inds.tagF = P;

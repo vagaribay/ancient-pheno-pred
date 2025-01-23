@@ -61,6 +61,10 @@ mutationEffect(m1) { return 1.0; }
 	inds.tagF = P;
 }
 
+200000 late() {
+	catn("NO COALESCENCE BY CYCLE 200000");
+}
+
 200000:200400 late() {
 	mean_pheno =  mean(p1.individuals.tagF);
 	var_pheno = var(p1.individuals.tagF);

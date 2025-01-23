@@ -54,3 +54,11 @@ sbatch --array=11-100 sim_any_evo_dynamic.sh stabilizing_selection 0.5 5.0 /user
 
 
 
+
+sbatch --array=1-100 sim_any_evo_dynamic.sh directional_selection 1.0 0.25 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/directional_selection/025/
+sbatch --array=1-100 sim_any_evo_dynamic.sh directional_selection 1.0 0.025 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/directional_selection/0025/
+sbatch --array=1-100 sim_any_evo_dynamic.sh directional_selection 1.0 0.0025 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/directional_selection/00025/
+sbatch --array=1-100 sim_any_evo_dynamic.sh directional_selection 0.5 0.25 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/directional_selection/025/
+sbatch --array=1-100 sim_any_evo_dynamic.sh directional_selection 0.5 0.025 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/directional_selection/0025/
+sbatch --array=1-100 sim_any_evo_dynamic.sh directional_selection 0.5 0.0025 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/directional_selection/00025/
+

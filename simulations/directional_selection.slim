@@ -33,6 +33,13 @@ mutationEffect(m1) { return 1.0; }
 	sim.addSubpop("p1", 10000); }
 
 1: late() {
+	if (sim.treeSeqCoalesced())
+	{
+		catn(sim.cycle + ": COALESCED");
+	}
+}
+
+1: late() {
 	inds = p1.individuals;
 	// sum the additive effect sizes of QTLs
 	G = inds.sumOfMutationsOfType(m1);

@@ -53,14 +53,14 @@ mutationEffect(m1) { return 1.0; }
 	inds.tagF = P;
 }
 
-100000:100400 late() {
+200000:200400 late() {
 	mean_pheno =  mean(p1.individuals.tagF);
 	var_pheno = var(p1.individuals.tagF);
 	catn(sim.cycle + ": m == " + mean_pheno + ", v == " + var_pheno);
 }
 
-100000:100400 late() {
-	if(sim.cycle == 100000 | sim.cycle == 100010 | sim.cycle == 100020 | sim.cycle == 100030 | sim.cycle == 100040 | sim.cycle == 100050 | sim.cycle == 100060 | sim.cycle == 100070 | sim.cycle == 100080 | sim.cycle == 100090 | sim.cycle == 100100 | sim.cycle == 100200 | sim.cycle == 100300 | sim.cycle == 100400)
+200000:200400 late() {
+	if(sim.cycle == 200000 | sim.cycle == 200010 | sim.cycle == 200020 | sim.cycle == 200030 | sim.cycle == 200040 | sim.cycle == 200050 | sim.cycle == 200060 | sim.cycle == 200070 | sim.cycle == 200080 | sim.cycle == 200090 | sim.cycle == 200100 | sim.cycle == 200200 | sim.cycle == 200300 | sim.cycle == 200400)
 	{
 		QTLs = sim.mutationsOfType(m1);
 		f = sim.mutationFrequencies(NULL, QTLs);
@@ -76,13 +76,6 @@ mutationEffect(m1) { return 1.0; }
 		file = "position\tselcoeff\tfreq\n" + file;
 		writeFile(path + "QTLs_" + asString(sim.cycle) + "_" + nrun + ".txt", file);
 		
-		//sample = sample(p1.individuals, 100);
-		//sample_pheno = sample.tagF;
-		//writeFile(path + "tpheno_" + asString(sim.cycle) + "_" + nrun + ".txt", asString(sample_pheno));
-		//sample.genomes.outputVCF(path + "noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
-		//all_inds = p1.individuals.genomes;
-		//all_inds.outputVCF(path + "allInds_noMultiallelicsVCF_" + asString(sim.cycle) + "_" + nrun + ".vcf", outputMultiallelics = F, simplifyNucleotides = T);
-
 		// 100 individuals
 		sample = sample(p1.individuals, 100);
 		sample_pheno = sample.tagF;

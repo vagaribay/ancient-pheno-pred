@@ -13,7 +13,7 @@ initialize() {
 	rec_ends = NULL;
 	rec_rates = NULL;
 	// for (index in 1:20){
-	for (index in 1:50){
+	for (index in 1:20){
 		initializeGenomicElement(g1, (index - 1 )*25000 + 2, (index - 1 )*25000 + 24999 + 2);
 		rec_ends = c( rec_ends, (index - 1)*25000 + 2);
 		rec_ends = c( rec_ends, (index - 1)*25000 + 24999 + 2);

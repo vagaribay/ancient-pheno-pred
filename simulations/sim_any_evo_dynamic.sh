@@ -64,7 +64,7 @@ sbatch --array=1-100 sim_any_evo_dynamic.sh directional_selection 0.5 0.025 /use
 sbatch --array=1-100 sim_any_evo_dynamic.sh directional_selection 0.5 0.0025 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/directional_selection/mid/00025/
 
 
-sbatch --array=100,29,42,69,80,92 sim_any_evo_dynamic.sh stabilizing_selection 1.0 1.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/stabilizing_selection/total/1/
+sbatch --array=69,101 sim_any_evo_dynamic.sh stabilizing_selection 1.0 1.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/stabilizing_selection/total/1/
 sbatch --array=48 sim_any_evo_dynamic.sh stabilizing_selection 1.0 5.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/stabilizing_selection/total/5/
 
 
@@ -74,7 +74,7 @@ sbatch --array=91 sim_any_evo_dynamic.sh stabilizing_selection 0.5 4.0 /users/va
 sbatch --array=42 sim_any_evo_dynamic.sh stabilizing_selection 0.5 5.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/stabilizing_selection/mid/5/
 
 
-sbatch --array=11,12,15,22,30,34,44,47,49,55,66,87,95 sim_any_evo_dynamic.sh neutral_evolution 1.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/neutral_evolution/total/
+sbatch --array=15,30,66,101-105 sim_any_evo_dynamic.sh neutral_evolution 1.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/neutral_evolution/total/
 sbatch --array=19,2,30,34,44,6 sim_any_evo_dynamic.sh neutral_evolution 0.5 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/neutral_evolution/mid/
 
 

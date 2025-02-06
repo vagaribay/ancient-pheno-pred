@@ -79,6 +79,7 @@ sbatch --array=19,2,30,34,44,6 sim_any_evo_dynamic.sh neutral_evolution 0.5 /use
 
 
 
+sbatch --array=56 sim_any_evo_dynamic.sh stabilizing_selection 1.0 1.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/stabilizing_selection/total/1/
 
 
 

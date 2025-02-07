@@ -1,3 +1,4 @@
+
 #!/bin/bash
 #SBATCH -t 10:00:00
 #SBATCH --mem=2g
@@ -98,6 +99,14 @@ sbatch --array=56 sim_any_evo_dynamic.sh stabilizing_selection 1.0 1.0 /users/va
 
 sbatch --array=22,34,43,49,51,7,79,85,92,93,95,96,101-110 sim_any_evo_dynamic.sh stabilizing_selection 0.5 1.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/stab_big_gsize/mid/1/
 sbatch --array=86,101 sim_any_evo_dynamic.sh stabilizing_selection 0.5 5.0 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/stab_big_gsize/mid/5/
+
+
+sbatch --array=11-120 sim_any_evo_dynamic.sh stabilizing_selection 0.8 7.28 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/realistic_params/HT/
+sbatch --array=11-120 sim_any_evo_dynamic.sh stabilizing_selection 0.7 6.61 /users/vanorveg/data/vanorveg/ancient-pheno-pred/output/realistic_params/BMI/
+
+
+
+
 
 
 

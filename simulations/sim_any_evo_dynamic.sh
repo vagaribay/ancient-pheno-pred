@@ -2,7 +2,6 @@
 #SBATCH -t 10:00:00
 #SBATCH --mem=2g
 # by Valeria Añorve-Garibay
-module load slim/4.0.1-kymgtmu
 # code to simulate any evolutionary dynamic based on SLiM scripts
 # TYPE defines the type of evolutionary scenario simulated.
 # The three options are "neutral_evolution", "stabilizing_selection" and "directional_selection" which defines 
@@ -19,6 +18,8 @@ module load slim/4.0.1-kymgtmu
 # sbatch --array=1 sim_any_evo_dynamic.sh stabilizing_selection 1.0 1.0 stabilizing_selection/
 # directional selection with h2 = 1 and QTLs sd = 0.25
 # sbatch --array=1 sim_any_evo_dynamic.sh directional_selection 1.0 0.25
+
+module load slim/4.0.1-kymgtmu
 
 TYPE=$1
 

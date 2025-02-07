@@ -1,3 +1,4 @@
+# by Valeria Añorve-Garibay
 #!/bin/bash
 #SBATCH -t 10:00:00
 #SBATCH --mem=2g

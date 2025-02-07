@@ -19,6 +19,7 @@ module load slim/4.0.1-kymgtmu
 # sbatch --array=1 sim_any_evo_dynamic.sh stabilizing_selection 1.0 1.0 stabilizing_selection/
 # directional selection with h2 = 1 and QTLs sd = 0.25
 # sbatch --array=1 sim_any_evo_dynamic.sh directional_selection 1.0 0.25
+
 TYPE=$1
 
 if [ "$TYPE" == "neutral_evolution" ]; then

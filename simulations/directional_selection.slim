@@ -5,9 +5,9 @@
 initialize() {
 	initializeTreeSeq(checkCoalescence=T);
 	initializeMutationRate(1e-08);
-	defineConstant("P_O", 0.0);
-	defineConstant("P_O_new", 1.0);
-	defineConstant("w", 1.0);	
+	defineConstant("P_O", 0.0); // optimum phenotype
+	defineConstant("P_O_new", 1.0); // new optimum phenotype
+	defineConstant("w", 1.0); // selection strength
 	// QTLs
 	initializeMutationType("m1", 0.5, "n", 0.0, QTL_sd); // QTL
 	m1.convertToSubstitution == F;
@@ -25,7 +25,7 @@ initialize() {
 }
 
 mutationEffect(m1) { return 1.0; }
-// burn-in (10N)
+// burn-in (20N)
 1 early(){
 	// save this run's identifier, used to save and restore
 	defineConstant("simID", getSeed());
@@ -50,7 +50,7 @@ mutationEffect(m1) { return 1.0; }
 	P = G + env;
 	// set fitness effects based on stabilizing selection
 	// during the burn-in period, trait will be under stabilizing selection at P_0 = 0
-	// rigth after the burn-in (10N), there is an optimum shift that pushes the effect sizes distribution towards the new optimum P_0 = 1 (directional selection)
+	// rigth after the burn-in (20N generations), there is an optimum shift that pushes the effect sizes distribution towards the new optimum P_0 = 1 (directional selection)
 	if(sim.cycle <= 200000){
 		inds.fitnessScaling = exp(-(((P - P_O)^2) / ((2)*(w^2))));
   }

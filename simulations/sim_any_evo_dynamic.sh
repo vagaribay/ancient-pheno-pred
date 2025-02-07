@@ -1,7 +1,7 @@
-# by Valeria Añorve-Garibay
 #!/bin/bash
 #SBATCH -t 10:00:00
 #SBATCH --mem=2g
+# by Valeria Añorve-Garibay
 module load slim/4.0.1-kymgtmu
 # code to simulate any evolutionary dynamic based on SLiM scripts
 # TYPE defines the type of evolutionary scenario simulated.

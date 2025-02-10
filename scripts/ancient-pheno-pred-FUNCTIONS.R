@@ -1,26 +1,30 @@
 # author: Valeria Añorve-Garibay
 # compute ancient-polygenic scores
-compute_aPS = function(nrep, path){
+compute_aPS = function(nrep, path, gen_zoom, present_sample_size){
+  if(gen_zoom == 1){
+    generations = c(200400, 200300, 200200, 200100,
+                    200090, 200080, 200070, 200060, 200050,
+                    200040, 200030, 200020, 200010, 200000)
+  } else{
+    generations = c(200400, 200300, 200200, 200100, 200000)
+  }
   
   for (rep in 1:nrep) {
     print(rep)
-    #for (gen in c(100400, 100300, 100200, 100100, 
-    #              100090, 100080, 100070, 100060, 100050,
-    #              100040, 100030, 100020, 100010, 100000)){
-    for (gen in c(100400, 100300, 100200, 100100, 100000)) {
+    for (gen in generations) {
       # true pheno for generation t
-      tpheno = read.table(paste(path, "tpheno_", gen, "_", rep, ".txt", sep = ""), header = FALSE)
-      colnames(tpheno) = "tpheno"
-      
+      #tpheno = read.table(paste(path, "tpheno_", gen, "_", rep, ".txt", sep = ""), header = FALSE)
+      #colnames(tpheno) = "tpheno"
       # VCF File for generation t (past)
-      pastVCF = read.vcfR(paste(path, "noMultiallelicsVCF_", gen, "_", rep, ".vcf", sep = ""), verbose = FALSE)
+      pastVCF = read.vcfR(paste(path, 100, "_noMultiallelicsVCF_", gen, "_", rep, ".vcf", sep = ""), verbose = FALSE)
+      #pastVCF = read.vcfR(paste(path, "noMultiallelicsVCF_", gen, "_", rep, ".vcf", sep = ""), verbose = FALSE)
       # positions and effect sizes for each mutation
       tmp.past = data.frame(do.call(rbind, strsplit(as.character(pastVCF@fix[,"INFO"]), ";")))[2]
       QTLs.past = data.frame("position" = as.integer(pastVCF@fix[,"POS"]), "s" = as.numeric(sub("S=", "", tmp.past$X2)))
       
       # VCF File for generation t = 0 (present-day)
-      presentVCF = read.vcfR(paste(path, "noMultiallelicsVCF_100400_", rep, ".vcf", sep = ""), verbose = FALSE)
-      #presentVCF = read.vcfR(paste(path, "allInds_noMultiallelicsVCF_100400_", rep, ".vcf", sep = ""), verbose = FALSE)
+      presentVCF = read.vcfR(paste(path, present_sample_size, "_noMultiallelicsVCF_200400_", rep, ".vcf", sep = ""), verbose = FALSE)
+      #presentVCF = read.vcfR(paste(path, "noMultiallelicsVCF_100400_", rep, ".vcf", sep = ""), verbose = FALSE)
       # QTLs: positions and effect sizes
       tmp.present = data.frame(do.call(rbind, strsplit(as.character(presentVCF@fix[,"INFO"]), ";")))[2]
       QTLs.present = data.frame("position" = as.integer(presentVCF@fix[,"POS"]), "s" = as.numeric(sub("S=", "", tmp.present$X2)))
@@ -54,30 +58,27 @@ compute_aPS = function(nrep, path){
         pPRS = c(pPRS, summatory)
       }
       # aPS
-      out.path = paste(path, "aPS_", gen, "_", rep, ".txt", sep = "")
-      #out.path = paste(path, "allInds_aPS_", gen, "_", rep, ".txt", sep = "")
+      out.path = paste(path, present_sample_size, "_aPS_", gen, "_", rep, ".txt", sep = "")
       write.table(pPRS, out.path, row.names = FALSE, col.names = FALSE, quote = FALSE)
     }
   }
 }
-
 # QTL effect sizes distribution
 compute_QTLsDist = function(nrep, path, gbp, bins, hsq){
-  pGen = 100400 - gbp
+  pGen = 200400 - gbp
   print(pGen)
   data.conserved = matrix(data = NA, nrow = nrep, ncol = length(bins))
   data.lost = matrix(data = NA, nrow = nrep, ncol = length(bins))
   nQTLs.x.bin.out = c()
   for (rep in 1:nrep) {
-    # VCF File for generation 100000 (400 generations ago)
-    pastVCF = read.vcfR(paste(path, "noMultiallelicsVCF_", pGen, "_", rep, ".vcf", sep = ""), verbose = FALSE)
+    # VCF File for generation 200000 (400 generations ago)
+    pastVCF = read.vcfR(paste(path, "100_noMultiallelicsVCF_", pGen, "_", rep, ".vcf", sep = ""), verbose = FALSE)
     # positions and effect sizes for each mutation
     tmp.past = data.frame(do.call(rbind, strsplit(as.character(pastVCF@fix[,"INFO"]), ";")))[2]
     QTLs.past = data.frame("position" = as.integer(pastVCF@fix[,"POS"]), "s" = as.numeric(sub("S=", "", tmp.past$X2)))
     
-    # VCF File for generation 100400 (present-day)
-    presentVCF = read.vcfR(paste(path, "noMultiallelicsVCF_100400_", rep, ".vcf", sep = ""), verbose = FALSE)
-    #presentVCF = read.vcfR(paste(path, "allInds_noMultiallelicsVCF_100400_", rep, ".vcf", sep = ""), verbose = FALSE)
+    # VCF File for generation 200400 (present-day)
+    presentVCF = read.vcfR(paste(path, "100_noMultiallelicsVCF_200400_", rep, ".vcf", sep = ""), verbose = FALSE)
     # QTLs: positions and effect sizes
     tmp.present = data.frame(do.call(rbind, strsplit(as.character(presentVCF@fix[,"INFO"]), ";")))[2]
     QTLs.present = data.frame("position" = as.integer(presentVCF@fix[,"POS"]), "s" = as.numeric(sub("S=", "", tmp.present$X2)))
@@ -99,8 +100,7 @@ compute_QTLsDist = function(nrep, path, gbp, bins, hsq){
     QTLs.past[shared_positions_index, "status"] = "conserved"
     QTLs.past[lost_positions_index, "status"] = "lost"
     write.table(QTLs.past, paste(path, "QTLs_C_L_", rep, ".txt", sep = ""), row.names = FALSE, col.names = TRUE, quote = FALSE)
-    #write.table(QTLs.past, paste(path, "allInds_QTLs_C_L_", rep, ".txt", sep = ""), row.names = FALSE, col.names = TRUE, quote = FALSE)
-  
+
     # effect sizes
     # conserved QTLs
     QTLs.conserved.bins = cut(QTLs.past[which(QTLs.past$status == "conserved"),"s"], breaks = bins)
@@ -132,12 +132,12 @@ compute_QTLsDist = function(nrep, path, gbp, bins, hsq){
   data$nQTLs.x.bin = nQTLs.x.bin.out
   
   return(data)
-
+  
 }
 
 # QTLs frequencies
 compute_QTLsFreq = function(nrep, path, gbp, bins, hsq){
-  pGen = 100400 - gbp
+  pGen = 200400 - gbp
   print(pGen)
   data.C = matrix(data = NA, nrow = nrep, ncol = length(bins))
   data.L = matrix(data = NA, nrow = nrep, ncol = length(bins))
@@ -178,58 +178,74 @@ compute_QTLsFreq = function(nrep, path, gbp, bins, hsq){
   return(data)
 }
 
-# compute r^2 and MSE between true pheno and ancient polygenic score
-compute_metrics = function(nrep, path, hsq){
+# compute r^2, MSE and bias between true pheno and ancient polygenic score
+compute_metrics = function(nrep, path, hsq, gen_zoom, present_sample_size){
+  if(gen_zoom == 1){
+    generations = c(200400, 200300, 200200, 200100,
+                    200090, 200080, 200070, 200060, 200050,
+                    200040, 200030, 200020, 200010, 200000)
+  } else{
+    generations = c(200400, 200300, 200200, 200100, 200000)
+  }
   # correlation between true pheno and aPS
-  #corr = matrix(data = NA, nrow = nrep, ncol = 14)
-  corr = matrix(data = NA, nrow = nrep, ncol = 5)
+  corr = matrix(data = NA, nrow = nrep, ncol = length(generations))
   # MSE between true pheno and aPS
-  #MSE = matrix(data = NA, nrow = nrep, ncol = 14)
-  MSE = matrix(data = NA, nrow = nrep, ncol = 5)
+  MSE = matrix(data = NA, nrow = nrep, ncol = length(generations))
+  # bias between true pheno and aPS
+  bias = matrix(data = NA, nrow = nrep, ncol = length(generations))
   for (rep in 1:nrep) {
     print(rep)
     corrs = c()
     MSEs = c()
-    #for (gen in c(100400, 100300, 100200, 100100, 
-    #              100090, 100080, 100070, 100060, 100050,
-    #              100040, 100030, 100020, 100010, 100000)){
-    for (gen in c(100400, 100300, 100200, 100100, 100000)) {
+    biases = c()
+    for (gen in generations) {
+      # true pheno for modern population (generation t = 0)
+      #tpheno_modern = read.table(paste(path, "tpheno_", 100400, "_", rep, ".txt", sep = ""), header = FALSE)
+      tpheno_modern = read.table(paste(path, 100, "_tpheno_", 200400, "_", rep,".txt", sep = ""), header = FALSE)
+      colnames(tpheno_modern) = "tpheno"
       # true pheno for generation t
-      tpheno = read.table(paste(path, "tpheno_", gen, "_", rep, ".txt", sep = ""), header = FALSE)
+      tpheno = read.table(paste(path, 100, "_tpheno_", gen, "_", rep, ".txt", sep = ""), header = FALSE)
       colnames(tpheno) = "tpheno"
       # aPS pheno for generation t
-      aPS = read.table(paste(path, "aPS_", gen, "_", rep, ".txt", sep = ""), header = FALSE)
-      #aPS = read.table(paste(path, "allInds_aPS_", gen, "_", rep, ".txt", sep = ""), header = FALSE)
+      aPS = read.table(paste(path, present_sample_size, "_aPS_", gen, "_", rep, ".txt", sep = ""), header = FALSE)
       colnames(aPS) = "aPS"
-      
       corrs = c(corrs, cor(tpheno$tpheno, aPS$aPS, method = "pearson"))
-      
-      MSEs = c(MSEs, mean((tpheno$tpheno - aPS$aPS)^2))
+      MSE_value = mean((tpheno$tpheno - aPS$aPS)^2)
+      MSE_scaled = (MSE_value)/(var(tpheno_modern$tpheno))
+      MSEs = c(MSEs, MSE_scaled)
+      bias_value = mean(aPS$aPS - tpheno$tpheno)
+      biases = c(biases, bias_value)
     }
-    print(corrs)
     corr[rep,] = corrs
     MSE[rep,] = MSEs
+    bias[rep,] = biases
   }
   corr.new = data.frame(corr)
-  #colnames(corr.new) = c("0", "100", "200", "300", "310", "320",
-  #                       "330", "340", "350", "360", "370",
-  #                       "380", "390", "400")
-  colnames(corr.new) = c("0", "100", "200", "300", "400")
+  colnames(corr.new) = as.character(generations)
   corr.new$rep = c(1:nrep)
   corr.new.out = NA
   corr.new.out = gather(corr.new, key = "generation", value = "corr", -rep)
   corr.new.out = corr.new.out[order(corr.new.out$rep),]
   corr.new.out$hsq = hsq
+  corr.new.out$present_sample_size = present_sample_size
   
   MSE.new = data.frame(MSE)
-  #colnames(MSE.new) = c("0", "100", "200", "300", "310", "320",
-  #                      "330", "340", "350", "360", "370",
-  #                      "380", "390", "400")
-  colnames(MSE.new) = c("0", "100", "200", "300", "400")
+  colnames(MSE.new) = as.character(generations)
   MSE.new$rep = c(1:nrep)
   MSE.new.out = NA
   MSE.new.out = gather(MSE.new, key = "generation", value = "MSE", -rep)
   MSE.new.out = MSE.new.out[order(MSE.new.out$rep),]
   MSE.new.out$hsq = hsq
-  return(list(pcorr = corr.new.out, MSE = MSE.new.out))
+  MSE.new.out$present_sample_size = present_sample_size
+  
+  bias.new = data.frame(bias)
+  colnames(bias.new) = as.character(generations)
+  bias.new$rep = c(1:nrep)
+  bias.new.out = NA
+  bias.new.out = gather(bias.new, key = "generation", value = "bias", -rep)
+  bias.new.out = bias.new.out[order(bias.new.out$rep),]
+  bias.new.out$hsq = hsq
+  bias.new.out$present_sample_size = present_sample_size
+  
+  return(list(pcorr = corr.new.out, MSE = MSE.new.out, bias = bias.new.out))
 }

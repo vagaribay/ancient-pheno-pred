@@ -1,5 +1,6 @@
 # author: Valeria Añorve-Garibay
 # the following commands were used to run functions to compute polygenic scores, precision metrics (mse, r^2, bias) and the number of lost/conserved QTLs per evolutionary scenario
+# for details in how metrics are computed see ancient-pheno-pred-FUNCTIONS.R
 
 library(vcfR)
 library(stringr)

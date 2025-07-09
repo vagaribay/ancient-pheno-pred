@@ -1,4 +1,4 @@
-This repository contains scripts used in our paper "Natural selection acting on complex traits hampers the predictive accuracy of polygenic scores in ancient samples" [https://doi.org/10.1101/2024.09.10.612181].
+This repository contains scripts used in our paper "Natural selection acting on complex traits hampers the predictive accuracy of polygenic scores in ancient samples" [https://doi.org/10.1016/j.ajhg.2025.05.009].
 
 simulations/ contain all the scripts to replicate the simulations performed in this analysis. For details on running each script see simulations/sim_any_evo_dynamic.sh.
 
